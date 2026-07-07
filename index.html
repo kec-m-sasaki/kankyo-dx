@@ -3,289 +3,515 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>環境事業部 DXお悩み受付窓口</title>
+    <title>環境事業部 DXアンバサダー・コンソール</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&display=swap');
         body { font-family: 'Inter', 'Noto Sans JP', sans-serif; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     </style>
 </head>
-<body class="h-full flex flex-col text-slate-800">
+<body class="h-full flex flex-col text-slate-800 bg-slate-100">
 
-    <header class="bg-gradient-to-r from-teal-800 to-indigo-900 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+    <!-- ヘッダー -->
+    <header class="bg-[#2D2A6B] text-white shadow-md relative z-10">
+        <div class="max-w-[1400px] mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-white/10 rounded-lg">
-                    <i data-lucide="cpu" class="w-6 h-6 text-emerald-300"></i>
+                <div class="p-1.5 bg-emerald-500/20 rounded border border-emerald-500/30">
+                    <i data-lucide="cpu" class="w-6 h-6 text-emerald-400"></i>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-bold tracking-tight">環境事業部 DXお悩み受付窓口</h1>
-                    <p class="text-[10px] sm:text-xs text-emerald-100/80">現場の「生の声」を直接会社に届ける窓口</p>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight text-white/95" id="header-title">環境事業部 DXお悩み受付窓口</h1>
+                    <p class="text-[10px] text-indigo-200/80" id="header-subtitle">現場の「生の声」を直接会社に届ける窓口</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button id="nav-btn" onclick="toggleMode()" class="text-xs font-medium bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-lg transition-all border border-white/10 flex items-center gap-1.5 shadow-sm">
-                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+            <div class="flex items-center gap-3">
+                <div id="status-badge" class="hidden items-center gap-1.5 text-[10px] bg-indigo-500/30 px-3 py-1.5 rounded-full text-indigo-100 border border-indigo-400/30">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>アンバサダーモード実行中</span>
+                </div>
+                <button id="nav-btn" onclick="toggleAdminMode()" class="text-xs font-medium bg-white/10 hover:bg-white/20 px-4 py-2 rounded border border-white/20 transition-all flex items-center gap-2">
+                    <i data-lucide="log-in" id="nav-btn-icon" class="w-4 h-4"></i>
                     <span id="nav-btn-text">管理者用ログイン</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-1 w-full max-w-7xl mx-auto px-3 py-6 sm:px-6 lg:px-8 flex flex-col gap-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- タブナビゲーション -->
+    <div id="admin-tabs" class="hidden bg-white border-b border-slate-200 shadow-sm sticky top-0 z-0">
+        <div class="max-w-[1400px] mx-auto px-4 flex justify-center gap-2 py-3">
+            <button onclick="switchTab('form')" id="tab-form" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all bg-indigo-600 text-white shadow-md">
+                <i data-lucide="edit-3" class="w-4 h-4"></i> 回答作成画面
+            </button>
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> 自動集計一覧
+            </button>
+            <button onclick="switchTab('report')" id="tab-report" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+                <i data-lucide="file-bar-chart-2" class="w-4 h-4"></i> 費用対効果 報告書作成
+            </button>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-1 w-full max-w-[1400px] mx-auto px-4 py-6 flex flex-col gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <div class="lg:col-span-2 flex flex-col gap-6">
+            <!-- 左側メインエリア -->
+            <div class="lg:col-span-8 flex flex-col gap-6 w-full">
                 
-                <div id="content-member" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-7 flex flex-col gap-5">
+                <!-- 【タブ1】回答作成画面 -->
+                <div id="view-form" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     
-                    <div id="member-auth-section" class="py-8 text-center flex flex-col items-center justify-center max-w-md mx-auto w-full gap-4">
-                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-1 shadow-sm">
-                            <i data-lucide="key-round" class="w-6 h-6"></i>
+                    <!-- ロック解除画面 -->
+                    <div id="member-auth-section" class="py-20 px-6 text-center flex flex-col items-center justify-center max-w-md mx-auto w-full gap-5">
+                        <div class="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center shadow-inner">
+                            <i data-lucide="key-round" class="w-8 h-8"></i>
                         </div>
-                        <h4 class="text-base font-bold text-slate-800">アクセスキーを入力してください</h4>
-                        <div class="w-full flex gap-2 mt-2">
-                            <input type="text" id="access-key-input" placeholder="kankyo2026" class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center font-mono tracking-widest text-slate-800 focus:outline-none focus:border-teal-600">
-                            <button onclick="verifyAccessKey()" class="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1">
-                                <span>解除</span>
-                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        <div>
+                            <h4 class="text-lg font-bold text-slate-800">アクセスキーを入力してください</h4>
+                            <p class="text-xs text-slate-500 mt-2">このシステムは環境事業部メンバー専用です。<br>配布されたキーを入力してロックを解除してください。</p>
+                        </div>
+                        <div class="w-full mt-2">
+                            <div class="relative w-full shadow-sm rounded-xl">
+                                <input type="password" id="access-key-input" onkeypress="if(event.key === 'Enter') verifyAccessKey()" placeholder="キーを入力" class="w-full px-5 py-4 bg-slate-50 border border-slate-300 rounded-xl text-center font-mono tracking-widest text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 pr-12 text-lg">
+                                <button type="button" onclick="togglePasswordVisibility('access-key-input')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors p-2">
+                                    <i data-lucide="eye" id="eye-icon-access-key-input" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <button onclick="verifyAccessKey()" class="w-full mt-3 px-6 py-4 bg-[#2D2A6B] hover:bg-indigo-900 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span>ロックを解除する</span>
+                                <i data-lucide="unlock" class="w-4 h-4"></i>
                             </button>
                         </div>
                     </div>
 
-                    <form id="submission-form" onsubmit="handleFormSubmit(event)" class="hidden flex flex-col gap-5">
-                        <div class="border-b border-slate-100 pb-3 flex items-center gap-3">
-                            <div class="p-2 bg-emerald-50 text-emerald-700 rounded-xl">
+                    <!-- 入力フォーム本体 -->
+                    <form id="submission-form" onsubmit="handleFormSubmit(event)" class="hidden flex flex-col gap-6 p-6 sm:p-8">
+                        <div class="border-b border-slate-100 pb-4 flex items-center gap-3">
+                            <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
                                 <i data-lucide="edit-3" class="w-5 h-5"></i>
                             </div>
                             <div>
-                                <h3 class="text-base sm:text-lg font-bold text-slate-900">現場の「ここが不便」をお聞かせください</h3>
-                                <p class="text-xs text-slate-500 mt-0.5">皆様の日々の業務をラクにするための窓口です。</p>
+                                <h3 class="text-lg font-bold text-slate-900">現場の「ここが不便、こうして欲しい」をお聞かせください</h3>
+                                <p class="text-xs text-slate-500 mt-1">皆様の日々の業務をラクにするための窓口です。送信された内容は自動集計されます。</p>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">お名前 <span class="text-rose-500">*</span></label>
-                                <input type="text" id="mem-name" placeholder="例：鈴木 太郎" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-600" required>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">お名前 <span class="text-rose-500">*</span></label>
+                                <input type="text" id="mem-name" placeholder="例：鈴木 太郎" class="w-full text-sm border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all bg-slate-50 focus:bg-white" required>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">担当業務・施設名 <span class="text-rose-500">*</span></label>
-                                <input type="text" id="mem-job" placeholder="例：維持管理（〇〇浄化センター）" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-600" required>
+                                <label class="block text-xs font-bold text-slate-700 mb-2">担当業務・施設名 <span class="text-rose-500">*</span></label>
+                                <input type="text" id="mem-job" placeholder="例：維持管理（〇〇浄化センター）" class="w-full text-sm border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all bg-slate-50 focus:bg-white" required>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-2">お悩みの分類 <span class="text-rose-500">*</span></label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <label class="radio-label border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 transition-all">
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="radio-label border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all select-none bg-white">
                                     <input type="radio" name="mem-type" value="手間・面倒" class="sr-only" onchange="updateRadioStyles()" required>
-                                    <i data-lucide="hourglass" class="w-4 h-4 text-amber-500"></i>
-                                    <span class="text-[11px] font-bold text-slate-700">手間・面倒</span>
+                                    <i data-lucide="hourglass" class="w-6 h-6 text-amber-500"></i>
+                                    <span class="text-xs font-bold text-slate-700">手間・面倒</span>
                                 </label>
-                                <label class="radio-label border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 transition-all">
+                                <label class="radio-label border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all select-none bg-white">
                                     <input type="radio" name="mem-type" value="困りごと・課題" class="sr-only" onchange="updateRadioStyles()" required>
-                                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-500"></i>
-                                    <span class="text-[11px] font-bold text-slate-700">困りごと・課題</span>
+                                    <i data-lucide="alert-circle" class="w-6 h-6 text-rose-500"></i>
+                                    <span class="text-xs font-bold text-slate-700">困りごと・課題</span>
                                 </label>
-                                <label class="radio-label border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 transition-all">
+                                <label class="radio-label border border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-slate-50 transition-all select-none bg-white">
                                     <input type="radio" name="mem-type" value="希望・改善案" class="sr-only" onchange="updateRadioStyles()" required>
-                                    <i data-lucide="sparkles" class="w-4 h-4 text-indigo-500"></i>
-                                    <span class="text-[11px] font-bold text-slate-700">希望・改善案</span>
+                                    <i data-lucide="sparkles" class="w-6 h-6 text-indigo-500"></i>
+                                    <span class="text-xs font-bold text-slate-700">希望・改善案</span>
                                 </label>
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">具体的なお悩み、改善案 <span class="text-rose-500">*</span></label>
-                            <textarea id="mem-content" rows="4" placeholder="具体的な作業内容と、大変な理由をご記入ください。" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-600" required></textarea>
+                            <label class="block text-xs font-bold text-slate-700 mb-2">具体的なお悩み、または「こうなったら嬉しい」という改善案 <span class="text-rose-500">*</span></label>
+                            <textarea id="mem-content" rows="5" placeholder="具体的な作業内容と、大変な理由をご記入ください。" class="w-full text-sm border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all bg-slate-50 focus:bg-white whitespace-pre-wrap" required></textarea>
                         </div>
 
-                        <div class="flex justify-end border-t border-slate-100 pt-4 mt-1">
-                            <button type="submit" class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5">
-                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                        <div class="flex flex-wrap gap-2 items-center text-[11px] text-slate-500 bg-amber-50/50 p-3 rounded-lg border border-amber-100">
+                            <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500 flex-shrink-0"></i>
+                            <span class="font-bold text-amber-700">記入例：</span>
+                            <span class="bg-white border border-slate-200 px-2 py-1 rounded shadow-sm text-slate-600">メーター点検の二重入力</span>
+                            <span class="bg-white border border-slate-200 px-2 py-1 rounded shadow-sm text-slate-600">毎日大量の写真整理</span>
+                            <span class="bg-white border border-slate-200 px-2 py-1 rounded shadow-sm text-slate-600">マニフェスト集計事務</span>
+                        </div>
+
+                        <div class="flex justify-between items-center border-t border-slate-100 pt-5 mt-2">
+                            <button type="button" onclick="clearForm()" class="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1 font-medium px-2 py-1 rounded">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i> クリア
+                            </button>
+                            <button type="submit" class="px-8 py-3.5 bg-[#0f766e] hover:bg-teal-800 text-white text-sm font-bold rounded-xl shadow-lg shadow-teal-700/30 transition-all active:scale-95 flex items-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i>
                                 <span>データベースに自動送信</span>
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <div id="content-admin" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col gap-5">
-                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
-                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <!-- 【タブ2】自動集計一覧 -->
+                <div id="view-dashboard" class="hidden bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col gap-6">
+                    <div class="border-b border-slate-100 pb-4 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                             <i data-lucide="layout-dashboard" class="w-5 h-5 text-indigo-600"></i>月別・優先順位管理ダッシュボード
                         </h3>
-                        <button onclick="syncWithGoogleSheet()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200 flex items-center gap-1">
-                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="sync-icon"></i>シートから同期
-                        </button>
+                        <div class="flex items-center gap-3">
+                            <button onclick="syncWithGoogleSheet()" class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200 flex items-center gap-1.5 transition-all active:scale-95">
+                                <i data-lucide="refresh-cw" class="w-4 h-4" id="sync-icon"></i>シートから自動同期
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="text-[11px] text-slate-500 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100 flex items-start gap-2">
+                        <i data-lucide="info" class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5"></i>
+                        <p>スプレッドシートの <b>E列に「優先度(高/中/低)」</b>、<b>F列に「ステータス(未対応/対応中/解決済)」</b> を手入力すると、このダッシュボードに自動連動して反映・集計されます。</p>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl text-center">
+                    <!-- 集計カード4連 -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="bg-white border border-slate-200 p-4 rounded-xl text-center shadow-sm">
                             <p class="text-[10px] font-bold text-slate-500">総受付件数</p>
-                            <p class="text-2xl font-extrabold text-slate-800" id="card-total">0</p>
+                            <p class="text-3xl font-extrabold text-slate-800 mt-1" id="card-total">0</p>
+                            <p class="text-[9px] text-slate-400 mt-1.5" id="card-breakdown">手間:0 課題:0 提案:0</p>
                         </div>
-                        <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl text-center">
-                            <p class="text-[10px] font-bold text-rose-600">未対応・検討中</p>
-                            <p class="text-2xl font-extrabold text-rose-700" id="card-pending">0</p>
+                        <div class="bg-rose-50/50 border border-rose-100 p-4 rounded-xl text-center shadow-sm">
+                            <p class="text-[10px] font-bold text-rose-600">① 未対応・検討中</p>
+                            <p class="text-3xl font-extrabold text-rose-700 mt-1" id="card-pending">0</p>
                         </div>
-                        <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-center">
-                            <p class="text-[10px] font-bold text-emerald-600">解決・対応済み</p>
-                            <p class="text-2xl font-extrabold text-emerald-700" id="card-solved">0</p>
+                        <div class="bg-emerald-50/50 border border-emerald-100 p-4 rounded-xl text-center shadow-sm">
+                            <p class="text-[10px] font-bold text-emerald-600">② 解決・対応済み</p>
+                            <p class="text-3xl font-extrabold text-emerald-700 mt-1" id="card-solved">0</p>
+                        </div>
+                        <div class="bg-amber-50/50 border border-amber-100 p-4 rounded-xl text-center shadow-sm">
+                            <p class="text-[10px] font-bold text-amber-600">⚡ 最優先(高ランク)</p>
+                            <p class="text-3xl font-extrabold text-amber-700 mt-1" id="card-high">0</p>
                         </div>
                     </div>
 
                     <div class="border border-slate-200 rounded-xl overflow-hidden">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-slate-600">
-                                <tr>
-                                    <th class="p-3">お名前</th>
-                                    <th class="p-3">担当業務</th>
-                                    <th class="p-3">分類</th>
-                                    <th class="p-3">お悩み内容</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dashboard-table-body" class="bg-white divide-y divide-slate-200">
-                                <tr>
-                                    <td colspan="4" class="p-8 text-center text-slate-400">シートから同期を押してください。</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="overflow-x-auto max-h-[500px]">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 sticky top-0 shadow-sm z-10">
+                                    <tr>
+                                        <th class="p-3 w-16 text-center text-xs">優先度</th>
+                                        <th class="p-3 w-24 text-center text-xs">ステータス</th>
+                                        <th class="p-3 w-28 text-xs">担当者</th>
+                                        <th class="p-3 w-36 text-xs">施設・業務名</th>
+                                        <th class="p-3 text-xs">お悩み・改善案の内容</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-table-body" class="bg-white divide-y divide-slate-100 text-slate-700">
+                                    <tr>
+                                        <td colspan="5" class="p-10 text-center text-slate-400 font-medium">
+                                            <i data-lucide="database" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>
+                                            データがありません。右上の「シートから自動同期」を押してください。
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+
+                <!-- 【タブ3】費用対効果 報告書作成 (復活！) -->
+                <div id="view-report" class="hidden bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col gap-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="file-bar-chart-2" class="w-5 h-5 text-indigo-600"></i>費用対効果 自動シミュレーション
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">「解決・対応済み」になった案件をもとに、社内の年間コスト削減効果を自動計算します。</p>
+                    </div>
+
+                    <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                            <div class="text-center md:text-left">
+                                <p class="text-xs font-bold text-indigo-600 mb-1">想定される年間削減コスト</p>
+                                <p class="text-4xl font-black text-indigo-900 tracking-tight">¥<span id="roi-money">0</span></p>
+                                <p class="text-[10px] text-slate-500 mt-2">※ 労働単価設定 × 想定削減時間 に基づく試算</p>
+                            </div>
+                            <div class="md:col-span-2 grid grid-cols-2 gap-4">
+                                <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
+                                    <p class="text-[10px] font-bold text-slate-500 mb-1">「解決済」の案件数</p>
+                                    <p class="text-xl font-bold text-slate-800"><span id="roi-cases">0</span> <span class="text-sm font-normal text-slate-500">件</span></p>
+                                </div>
+                                <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm">
+                                    <p class="text-[10px] font-bold text-slate-500 mb-1">年間削減される労働時間</p>
+                                    <p class="text-xl font-bold text-slate-800"><span id="roi-hours">0</span> <span class="text-sm font-normal text-slate-500">時間</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 自動生成レポートエリア -->
+                    <div class="flex flex-col gap-3 mt-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-slate-800">📋 報告書レジュメ（自動生成）</span>
+                            <button onclick="copyGeneratedReport()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-all active:scale-95">
+                                <i data-lucide="copy" class="w-4 h-4"></i>コピーする
+                            </button>
+                        </div>
+                        <textarea id="generated-report-area" rows="12" class="w-full text-xs font-mono border border-slate-300 rounded-lg p-4 bg-slate-50 outline-none leading-relaxed text-slate-700" readonly></textarea>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="flex flex-col gap-4">
+            <!-- 右側パネルエリア -->
+            <div class="lg:col-span-4 flex flex-col gap-5">
                 
-                <div id="admin-auth-panel" class="hidden bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
-                    <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5"><i data-lucide="shield-alert" class="w-4 h-4 text-indigo-600"></i>特権管理者ログイン</h4>
-                    <div class="flex gap-2">
-                        <input type="password" id="admin-password-input" placeholder="パスワード (dx2026)" class="flex-1 text-xs px-3 py-2 border rounded-lg">
-                        <button onclick="verifyAdminPassword()" class="text-xs bg-indigo-700 text-white px-3 py-2 rounded-lg font-bold">ログイン</button>
+                <!-- 管理者ログインパネル -->
+                <div id="admin-auth-panel" class="hidden bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                    <h4 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                        <i data-lucide="shield-alert" class="w-4 h-4 text-[#2D2A6B]"></i>特権管理者ログイン
+                    </h4>
+                    <p class="text-[10px] text-slate-500">ダッシュボードを閲覧するにはパスワードを入力してください。</p>
+                    <div class="flex flex-col gap-2 mt-1">
+                        <div class="relative w-full">
+                            <input type="password" id="admin-password-input" onkeypress="if(event.key === 'Enter') verifyAdminPassword()" placeholder="パスワードを入力" class="w-full text-sm px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 pr-10">
+                            <button type="button" onclick="togglePasswordVisibility('admin-password-input')" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-700 p-1">
+                                <i data-lucide="eye" id="eye-icon-admin-password-input" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <button onclick="verifyAdminPassword()" class="w-full text-sm bg-[#2D2A6B] hover:bg-indigo-900 text-white py-2.5 rounded-lg font-bold transition-all active:scale-95 shadow-sm">
+                            ログインする
+                        </button>
                     </div>
                 </div>
 
-                <div id="settings-panel" class="hidden bg-slate-900 text-slate-200 p-4 rounded-2xl flex flex-col gap-3">
-                    <h4 class="text-xs font-bold text-indigo-400">連携設定 (管理者のみ)</h4>
-                    <div class="flex flex-col gap-2 text-slate-300">
-                        <input type="text" id="cfg-form-url" placeholder="Googleフォーム送信先URL" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-2">
-                        <div class="grid grid-cols-3 gap-1">
-                            <input type="text" id="cfg-id-name" placeholder="名前ID" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-1.5 text-center">
-                            <input type="text" id="cfg-id-job" placeholder="業務ID" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-1.5 text-center">
-                            <input type="text" id="cfg-id-type" placeholder="分類ID" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-1.5 text-center">
-                        </div>
-                        <input type="text" id="cfg-id-content" placeholder="お悩み内容ID" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-2">
-                        <input type="text" id="cfg-csv-url" placeholder="スプレッドシート公開CSV URL" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-2">
-                        <input type="text" id="cfg-chat-url" placeholder="通知用チャットURL (Webhook)" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-2">
+                <!-- Googleクラウド連携設定パネル -->
+                <div id="settings-panel" class="hidden bg-[#0f172a] text-slate-200 p-5 rounded-xl shadow-lg flex flex-col gap-4 border border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+                        <h4 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+                            <i data-lucide="settings" class="w-4 h-4"></i>Googleクラウド連携設定
+                        </h4>
                     </div>
-                    <button onclick="saveConfigurations()" class="w-full text-xs bg-indigo-600 text-white py-2 rounded-lg font-bold mt-2">設定を保存</button>
+                    
+                    <div class="flex flex-col gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-1">① Google フォーム連携状態</label>
+                            <div class="w-full text-xs bg-slate-900 border border-slate-700 rounded p-2 text-emerald-500 flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> 接続完了 (ハードコード済)
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-1">② スプレッドシート連携状態</label>
+                            <div class="w-full text-xs bg-slate-900 border border-slate-700 rounded p-2 text-emerald-500 flex items-center gap-2">
+                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> 同期可能 (ハードコード済)
+                            </div>
+                        </div>
+                        
+                        <hr class="border-slate-800 my-1">
+                        
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-1">③ メンバー用アクセスキー</label>
+                            <div class="relative">
+                                <input type="password" id="cfg-access-key" class="w-full text-sm bg-slate-900 border border-slate-700 rounded p-2 focus:border-indigo-500 focus:outline-none pr-10 text-white">
+                                <button type="button" onclick="togglePasswordVisibility('cfg-access-key')" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+                                    <i data-lucide="eye" id="eye-icon-cfg-access-key" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 mb-1">④ 労働単価 (時間円換算 / 費用対効果計算用)</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="cfg-hourly-wage" class="w-full text-sm bg-slate-900 border border-slate-700 rounded p-2 focus:border-indigo-500 focus:outline-none text-right text-white">
+                                <span class="text-xs text-slate-400">円/時</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="saveConfigurations()" class="w-full mt-2 text-xs bg-[#059669] hover:bg-emerald-700 text-white py-2.5 rounded-lg font-bold transition-all active:scale-95 shadow-md flex justify-center items-center gap-1.5">
+                        <i data-lucide="save" class="w-4 h-4"></i> 連携設定を安全に保存
+                    </button>
+                </div>
+
+                <!-- スマホ共有用QRコード -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                    <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="smartphone" class="w-4 h-4 text-indigo-600"></i>スマホ共有用 QRコード
+                    </h4>
+                    <div class="text-[10px] text-slate-500 mb-1">
+                        この画面のURLをQRコード化します。<br>メンバーのスマホカメラで読み取ってください。
+                    </div>
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="w-full flex gap-1">
+                            <input type="text" id="qr-url-input" class="flex-1 text-[10px] px-2 py-1.5 border border-slate-300 rounded bg-slate-50 focus:outline-none" placeholder="URLを入力">
+                            <button onclick="generateQR()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-[10px] font-bold text-slate-700 transition-colors">更新</button>
+                        </div>
+                        <img id="qr-code-img" src="" alt="QR Code" class="w-32 h-32 border border-slate-200 rounded-lg p-2 shadow-sm bg-white">
+                    </div>
                 </div>
 
             </div>
         </div>
     </main>
 
-    <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 transition-all duration-300 translate-y-20 opacity-0 z-50">
-        <i id="toast-icon" data-lucide="info" class="w-4 h-4"></i>
+    <!-- トースト通知 -->
+    <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-900/90 backdrop-blur text-white text-sm font-medium px-5 py-3 rounded-full shadow-2xl flex items-center gap-2 transition-all duration-300 translate-y-20 opacity-0 z-50 pointer-events-none">
+        <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
         <span id="toast-message">メッセージ</span>
     </div>
 
+    <!-- アプリケーション・ロジック -->
     <script>
-        lucide.createIcons();
-        let currentMode = 'member';
-        let CONFIG = {};
+        // ★ 連携データの埋め込み
+        const APP_DATA = {
+            formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLScfIa80deiHeYvgI8zfiYfyIBx-TC7tNVcQOnDAd-SPseymeA/formResponse',
+            idName: '913641658',
+            idJob: '1840435080',
+            idContent: '1857992662',
+            csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSz_fSuWlhqpbZjmR7jhJL5VE3eqs2FVJua1vXpHcur08oS4YbfuvLhbvmOzHSDiENNfLVVDNS8QlJh/pub?output=csv',
+            chatUrl: 'https://chat.googleapis.com/v1/spaces/AAQAse_VB10/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=bCK_z3nQhpmDGEODHJIp7wmIKZGlorCjh9SD33086mo'
+        };
 
-        // 起動時に保存された設定を読み込む
+        let USER_CONFIG = { accessKey: 'kankyo2026', hourlyWage: 2500 };
+        let currentMode = 'member'; 
+        let currentSolvedCases = 0; 
+
         window.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('dx_window_config');
-            if (saved) {
-                CONFIG = JSON.parse(saved);
-                document.getElementById('cfg-form-url').value = CONFIG.formUrl || '';
-                document.getElementById('cfg-id-name').value = CONFIG.idName || '';
-                document.getElementById('cfg-id-job').value = CONFIG.idJob || '';
-                document.getElementById('cfg-id-type').value = CONFIG.idType || '';
-                document.getElementById('cfg-id-content').value = CONFIG.idContent || '';
-                document.getElementById('cfg-csv-url').value = CONFIG.csvUrl || '';
-                document.getElementById('cfg-chat-url').value = CONFIG.chatUrl || '';
-            }
+            lucide.createIcons();
+            const saved = localStorage.getItem('dx_custom_config');
+            if (saved) USER_CONFIG = { ...USER_CONFIG, ...JSON.parse(saved) };
+            
+            document.getElementById('cfg-access-key').value = USER_CONFIG.accessKey;
+            document.getElementById('cfg-hourly-wage').value = USER_CONFIG.hourlyWage;
+
+            const currentUrl = window.location.href.split('#')[0];
+            document.getElementById('qr-url-input').value = currentUrl;
+            generateQR();
         });
 
-        // ラジオボタンの見た目を切り替える関数（バグ修正済）
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(`eye-icon-${inputId}`);
+            if (input.type === 'password') {
+                input.type = 'text'; icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password'; icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
         function updateRadioStyles() {
             const labels = document.querySelectorAll('.radio-label');
             labels.forEach(label => {
                 const radio = label.querySelector('input[type="radio"]');
                 if (radio && radio.checked) {
-                    label.classList.remove('border-slate-200', 'hover:bg-slate-50');
-                    label.classList.add('border-teal-600', 'bg-teal-50', 'border-2');
+                    label.classList.remove('border-slate-200', 'bg-white', 'hover:bg-slate-50');
+                    label.classList.add('border-indigo-500', 'bg-indigo-50/50', 'border-2', 'shadow-sm', 'scale-[1.02]');
                 } else {
-                    label.classList.add('border-slate-200', 'hover:bg-slate-50');
-                    label.classList.remove('border-teal-600', 'bg-teal-50', 'border-2');
+                    label.classList.add('border-slate-200', 'bg-white', 'hover:bg-slate-50');
+                    label.classList.remove('border-indigo-500', 'bg-indigo-50/50', 'border-2', 'shadow-sm', 'scale-[1.02]');
                 }
             });
         }
 
-        // メンバーパスワード認証
+        function clearForm() {
+            document.getElementById('submission-form').reset();
+            updateRadioStyles();
+        }
+
+        function generateQR() {
+            const url = document.getElementById('qr-url-input').value;
+            const img = document.getElementById('qr-code-img');
+            if (url) img.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+        }
+
         function verifyAccessKey() {
-            if (document.getElementById('access-key-input').value === 'kankyo2026') {
+            const key = document.getElementById('access-key-input').value.trim();
+            if (USER_CONFIG.accessKey === '' || key === USER_CONFIG.accessKey) {
                 document.getElementById('member-auth-section').classList.add('hidden');
                 document.getElementById('submission-form').classList.remove('hidden');
                 showToast("ロックを解除しました", "unlock");
+                
+                // ヘッダータイトルをメンバー用に変更
+                document.getElementById('header-title').textContent = "環境事業部 DXお悩み受付窓口";
+                document.getElementById('header-subtitle').textContent = "現場の「生の声」を直接会社に届ける窓口";
             } else {
-                showToast("キーが違います", "lock");
+                showToast("キーが正しくありません", "lock");
             }
         }
 
-        // 管理者パスワード認証と画面切り替え
-        function toggleMode() {
+        function toggleAdminMode() {
             if (currentMode === 'member') {
                 document.getElementById('admin-auth-panel').classList.remove('hidden');
+                document.getElementById('admin-password-input').focus();
             } else {
                 currentMode = 'member';
                 document.getElementById('nav-btn-text').textContent = '管理者用ログイン';
-                document.getElementById('content-admin').classList.add('hidden');
+                document.getElementById('nav-btn-icon').setAttribute('data-lucide', 'log-in');
+                document.getElementById('nav-btn').classList.remove('bg-indigo-600', 'border-indigo-500');
+                document.getElementById('status-badge').classList.add('hidden');
+                document.getElementById('admin-tabs').classList.add('hidden');
                 document.getElementById('settings-panel').classList.add('hidden');
-                document.getElementById('content-member').classList.remove('hidden');
+                switchTab('form');
+                lucide.createIcons();
+                showToast("ログアウトしました", "log-out");
             }
         }
 
         function verifyAdminPassword() {
-            if (document.getElementById('admin-password-input').value === 'dx2026') {
+            const pass = document.getElementById('admin-password-input').value.trim();
+            if (pass === 'dx2026') {
                 currentMode = 'admin';
                 document.getElementById('admin-auth-panel').classList.add('hidden');
                 document.getElementById('nav-btn-text').textContent = 'ログアウト';
-                document.getElementById('content-member').classList.add('hidden');
-                document.getElementById('content-admin').classList.remove('hidden');
+                document.getElementById('nav-btn-icon').setAttribute('data-lucide', 'log-out');
+                document.getElementById('nav-btn').classList.add('bg-indigo-600', 'border-indigo-500');
+                document.getElementById('status-badge').classList.remove('hidden');
+                document.getElementById('admin-tabs').classList.remove('hidden');
                 document.getElementById('settings-panel').classList.remove('hidden');
-                showToast("管理者モードに切り替えました", "shield-check");
-                if (CONFIG.csvUrl) syncWithGoogleSheet();
+                document.getElementById('admin-password-input').value = '';
+                
+                // ヘッダータイトルを管理者用に変更
+                document.getElementById('header-title').textContent = "環境事業部 DXアンバサダー・コンソール";
+                document.getElementById('header-subtitle').textContent = "月別集計ダッシュボード ＆ 費用対効果自動計算システム";
+
+                lucide.createIcons();
+                showToast("特権管理者モードに移行しました", "shield-check");
+                switchTab('dashboard');
+                syncWithGoogleSheet();
             } else {
-                showToast("パスワードが違います", "lock");
+                showToast("パスワードが正しくありません", "lock");
             }
         }
 
-        // 設定の保存
-        function saveConfigurations() {
-            CONFIG = {
-                formUrl: document.getElementById('cfg-form-url').value.trim(),
-                idName: document.getElementById('cfg-id-name').value.trim(),
-                idJob: document.getElementById('cfg-id-job').value.trim(),
-                idType: document.getElementById('cfg-id-type').value.trim(),
-                idContent: document.getElementById('cfg-id-content').value.trim(),
-                csvUrl: document.getElementById('cfg-csv-url').value.trim(),
-                chatUrl: document.getElementById('cfg-chat-url').value.trim()
-            };
-            localStorage.setItem('dx_window_config', JSON.stringify(CONFIG));
-            showToast("設定を保存しました", "save");
+        function switchTab(tabId) {
+            document.getElementById('view-form').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-report').classList.add('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+            });
+
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if(activeBtn) activeBtn.className = "tab-btn px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-all bg-[#2D2A6B] text-white shadow-md";
+            if(tabId === 'report') calculateROI();
         }
 
-        // フォーム送信（Googleフォーム ＆ Chat）
+        function saveConfigurations() {
+            USER_CONFIG.accessKey = document.getElementById('cfg-access-key').value.trim();
+            USER_CONFIG.hourlyWage = parseInt(document.getElementById('cfg-hourly-wage').value) || 2500;
+            localStorage.setItem('dx_custom_config', JSON.stringify(USER_CONFIG));
+            showToast("連携設定をローカルに保存しました", "save");
+            calculateROI(); 
+        }
+
         async function handleFormSubmit(e) {
             e.preventDefault();
-            if (!CONFIG.formUrl) return showToast("管理者の連携設定が終わっていません", "alert-circle");
-
             const typeInput = document.querySelector('input[name="mem-type"]:checked');
             if (!typeInput) return showToast("分類を選択してください", "alert-circle");
 
@@ -296,75 +522,262 @@
                 content: document.getElementById('mem-content').value
             };
 
+            const combinedContent = `【${data.type}】\n${data.content}`;
             const formData = new FormData();
-            formData.append(`entry.${CONFIG.idName}`, data.name);
-            formData.append(`entry.${CONFIG.idJob}`, data.job);
-            formData.append(`entry.${CONFIG.idType}`, data.type);
-            formData.append(`entry.${CONFIG.idContent}`, data.content);
+            formData.append(`entry.${APP_DATA.idName}`, data.name);
+            formData.append(`entry.${APP_DATA.idJob}`, data.job);
+            formData.append(`entry.${APP_DATA.idContent}`, combinedContent);
+
+            showToast("データベースへ送信中...", "loader");
 
             try {
-                fetch(CONFIG.formUrl, { method: 'POST', body: formData, mode: 'no-cors' });
-                
-                if (CONFIG.chatUrl) {
-                    const chatText = `【新着】お悩み受付\n送信者: ${data.name} (${data.job})\n分類: ${data.type}\n内容:\n${data.content}`;
-                    fetch(CONFIG.chatUrl, {
+                fetch(APP_DATA.formUrl, { method: 'POST', body: formData, mode: 'no-cors' });
+                if (APP_DATA.chatUrl) {
+                    const chatText = `【新着】お悩み受付窓口に新規投稿がありました！\n\n■ 送信者: ${data.name} (${data.job})\n■ 分類: ${data.type}\n■ 内容:\n${data.content}`;
+                    fetch(APP_DATA.chatUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ text: chatText })
                     });
                 }
-
-                showToast("送信が完了しました！", "check-circle");
-                e.target.reset();
-                updateRadioStyles();
+                showToast("送信が完了しました！ご協力ありがとうございます。", "check-circle");
+                clearForm();
             } catch (err) {
                 showToast("通信エラーが発生しました", "alert-octagon");
             }
         }
 
-        // スプレッドシート同期処理（ダッシュボード）
+        // ==========================================
+        // 【重要】堅牢なCSV解析処理（改行ズレ防止）
+        // ==========================================
+        function parseCSV(text) {
+            let lines = [];
+            let row = [];
+            let inQuotes = false;
+            let currentCell = '';
+
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i + 1];
+
+                if (c === '"') {
+                    if (inQuotes && next === '"') {
+                        currentCell += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (c === ',' && !inQuotes) {
+                    row.push(currentCell);
+                    currentCell = '';
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') i++;
+                    row.push(currentCell);
+                    lines.push(row);
+                    row = [];
+                    currentCell = '';
+                } else {
+                    currentCell += c;
+                }
+            }
+            if (currentCell !== '' || row.length > 0) {
+                row.push(currentCell);
+                lines.push(row);
+            }
+            return lines;
+        }
+
         async function syncWithGoogleSheet() {
-            if (!CONFIG.csvUrl) return showToast("CSV URLが設定されていません", "alert-circle");
             const icon = document.getElementById('sync-icon');
-            icon.classList.add('animate-spin');
+            if (icon) icon.classList.add('animate-spin');
 
             try {
-                const res = await fetch(`${CONFIG.csvUrl}&t=${Date.now()}`);
+                const res = await fetch(`${APP_DATA.csvUrl}&t=${Date.now()}`);
                 const text = await res.text();
                 
-                const lines = text.split(/\r?\n/).slice(1).filter(l => l.trim() !== '');
-                const tbody = document.getElementById('dashboard-table-body');
-                tbody.innerHTML = '';
+                // 改行対策版のパーサーを使用
+                const parsedLines = parseCSV(text);
                 
-                document.getElementById('card-total').textContent = lines.length;
-                document.getElementById('card-pending').textContent = Math.ceil(lines.length * 0.7);
-                document.getElementById('card-solved').textContent = Math.floor(lines.length * 0.3);
+                // ヘッダー(1行目)を除外、空行を除外
+                const dataLines = parsedLines.slice(1).filter(l => l.length > 1 || (l[0] && l[0].trim() !== ''));
+                
+                const tbody = document.getElementById('dashboard-table-body');
+                if (tbody) tbody.innerHTML = '';
+                
+                let total = dataLines.length;
+                let hand = 0, task = 0, idea = 0;
+                let pendingCount = 0, solvedCount = 0, highPriorityCount = 0;
+                let reportDataList = [];
 
-                if (lines.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">データがありません</td></tr>`;
+                if (total === 0) {
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 font-bold"><i data-lucide="database" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>データがありません。新しく送信してください。</td></tr>`;
+                    updateDashboardCards(0, 0, 0, 0, 0, 0, 0);
+                    currentSolvedCases = 0;
+                    generatePresentationScript([], 0, 0, 0, 0, 0, 0);
+                    showToast("同期完了。現在データは0件です。", "check");
                     return;
                 }
 
-                lines.forEach(line => {
-                    // 簡易CSVパース
-                    const cells = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, ''));
-                    if (cells.length >= 4) {
+                dataLines.forEach((cells) => {
+                    const dateRaw = cells[0] || '';
+                    const name = cells[1] || '匿名';
+                    const job = cells[2] || '未記入';
+                    let rawContent = cells[3] || '';
+                    
+                    // スプレッドシートのE列(優先度), F列(ステータス)
+                    const priorityVal = cells[4] ? cells[4].trim() : '中';
+                    const statusVal = cells[5] ? cells[5].trim() : '未対応';
+
+                    let typeStr = '未分類';
+                    
+                    // 【〇〇】のタグを抽出して本文から消す
+                    const typeMatch = rawContent.match(/^【(.*?)】/);
+                    if (typeMatch) {
+                        typeStr = typeMatch[1];
+                        rawContent = rawContent.replace(/^【.*?】\s*/, '').trim();
+                    }
+
+                    if(typeStr.includes('手間')) hand++;
+                    if(typeStr.includes('困りごと')) task++;
+                    if(typeStr.includes('希望')) idea++;
+
+                    if (statusVal.includes('対応済') || statusVal.includes('解決') || statusVal.includes('完了')) solvedCount++;
+                    else pendingCount++;
+
+                    if (priorityVal.includes('高') || priorityVal.includes('大')) highPriorityCount++;
+
+                    // 報告書用に配列に保存
+                    reportDataList.push({
+                        name: name, job: job, type: typeStr, content: rawContent, priority: priorityVal, status: statusVal
+                    });
+
+                    // UI用の装飾
+                    let priorityHtml = '<span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-bold">中</span>';
+                    if (priorityVal.includes('高') || priorityVal.includes('大')) {
+                        priorityHtml = '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded font-bold">' + priorityVal + '</span>';
+                    } else if (priorityVal.includes('低')) {
+                        priorityHtml = '<span class="px-2 py-0.5 bg-slate-50 text-slate-400 rounded font-bold">' + priorityVal + '</span>';
+                    } else if (priorityVal !== '中' && priorityVal !== '') {
+                        priorityHtml = '<span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-bold">' + priorityVal + '</span>';
+                    }
+
+                    let statusHtml = '<span class="px-2 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded font-bold">未対応</span>';
+                    if (statusVal.includes('対応済') || statusVal.includes('解決') || statusVal.includes('完了')) {
+                        statusHtml = '<span class="px-2 py-1 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded font-bold">' + statusVal + '</span>';
+                    } else if (statusVal.includes('対応中')) {
+                        statusHtml = '<span class="px-2 py-1 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded font-bold">' + statusVal + '</span>';
+                    } else if (statusVal !== '未対応' && statusVal !== '') {
+                        statusHtml = '<span class="px-2 py-1 bg-rose-50 text-rose-600 border border-rose-200 rounded font-bold">' + statusVal + '</span>';
+                    }
+
+                    if (tbody) {
                         tbody.innerHTML += `
-                            <tr class="hover:bg-slate-50">
-                                <td class="p-3 font-medium">${cells[1] || ''}</td>
-                                <td class="p-3 text-slate-500">${cells[2] || ''}</td>
-                                <td class="p-3 text-indigo-600 font-bold">${cells[3] || ''}</td>
-                                <td class="p-3">${cells[4] || ''}</td>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="p-3 text-center border-b">${priorityHtml}</td>
+                                <td class="p-3 text-center border-b">${statusHtml}</td>
+                                <td class="p-3 font-bold text-slate-900 border-b">${name}</td>
+                                <td class="p-3 text-slate-500 border-b">${job}</td>
+                                <td class="p-3 border-b">
+                                    <span class="font-bold text-indigo-600 mr-1">[${typeStr}]</span> 
+                                    <span class="text-slate-700 leading-relaxed whitespace-pre-wrap">${rawContent}</span>
+                                </td>
                             </tr>
                         `;
                     }
                 });
-                showToast("データを同期しました", "check");
+
+                currentSolvedCases = solvedCount; 
+                updateDashboardCards(total, hand, task, idea, pendingCount, solvedCount, highPriorityCount);
+                
+                // 費用対効果と報告書を更新
+                const roiData = calculateROI(); 
+                generatePresentationScript(reportDataList, total, hand, task, idea, roiData.hours, roiData.money);
+
+                showToast(`最新データ（${total}件）を同期しました`, "check");
+
             } catch (err) {
+                console.error(err);
                 showToast("データ同期に失敗しました", "alert-circle");
             } finally {
-                icon.classList.remove('animate-spin');
+                // エラー時でも確実にアニメーションを止める
+                if (icon) icon.classList.remove('animate-spin');
+                lucide.createIcons();
             }
+        }
+
+        function updateDashboardCards(total, hand, task, idea, pending, solved, high) {
+            document.getElementById('card-total').textContent = total;
+            document.getElementById('card-breakdown').textContent = `手間:${hand} 課題:${task} 提案:${idea}`;
+            document.getElementById('card-pending').textContent = pending;
+            document.getElementById('card-solved').textContent = solved;
+            document.getElementById('card-high').textContent = high;
+        }
+
+        function calculateROI() {
+            // 1件解決につき、月間2時間（年間24時間）の削減効果があると仮定
+            const assumedHoursPerCase = 2; 
+            const totalHoursSaved = currentSolvedCases * assumedHoursPerCase * 12; // 年間削減時間
+            const totalCostSaved = totalHoursSaved * USER_CONFIG.hourlyWage; // 年間削減コスト(円)
+
+            document.getElementById('roi-cases').textContent = currentSolvedCases;
+            document.getElementById('roi-hours').textContent = totalHoursSaved.toLocaleString();
+            document.getElementById('roi-money').textContent = totalCostSaved.toLocaleString();
+            
+            return { hours: totalHoursSaved, money: totalCostSaved };
+        }
+
+        // ==========================================
+        // 【復元】報告書自動生成ロジック
+        // ==========================================
+        function generatePresentationScript(dataList, total, type1, type2, type3, yearlyHours, moneySaved) {
+            let reportText = `環境事業部 維持管理アンバサダー報告レジュメ
+
+【発表テーマ】
+実務にいかす環境事業部・維持管理DX ― 現場のリアルな声と費用対効果の概算算出
+
+■ 1. 現場の課題収集 ＆ 進捗状況（ダッシュボード集計）
+--------------------------------------------------
+・収集した現場の『生の声』： 合計 ${total} 件
+・内訳分析：
+  └ ① 手間・面倒なルーティン作業： ${type1} 件
+  └ ② 困りごと・負担の大きい課題： ${type2} 件
+  └ ③ 希望・改善に関するアイデア： ${type3} 件
+・現在の進捗状況：
+  └ 解決・対応済み： ${currentSolvedCases} 件
+  └ 未対応・検討中： ${total - currentSolvedCases} 件
+
+■ 2. DX化による期待される『費用対効果』の概算予測
+--------------------------------------------------
+※ 解決済み案件（${currentSolvedCases}件）に対して、1件あたり月間2時間の削減効果、労務単価 ${USER_CONFIG.hourlyWage.toLocaleString()} 円/時として試算
+
+・【年間想定削減時間】： 合計 約 ${yearlyHours.toLocaleString()} 時間のゆとり創出
+💰【削減される想定人件費】： 年間 約 ${moneySaved.toLocaleString()} 円のコストカット効果
+
+■ 3. 主要なお悩みのピックアップ
+--------------------------------------------------\n`;
+
+            if (dataList.length === 0) {
+                reportText += `データがありません。\n`;
+            } else {
+                // 上位3件をピックアップ
+                dataList.slice(0, 3).forEach((data, index) => {
+                    reportText += `[案件 #${index + 1}] (優先度: ${data.priority || '中'} / 状態: ${data.status || '未対応'})
+・報告者: ${data.name}さん (${data.job})
+・分類: ${data.type}
+・内容: ${data.content}\n--------------------------------------------------\n`;
+                });
+            }
+
+            const rArea = document.getElementById('generated-report-area');
+            if (rArea) rArea.value = reportText;
+        }
+
+        function copyGeneratedReport() {
+            const area = document.getElementById('generated-report-area'); 
+            if (!area) return;
+            area.select();
+            document.execCommand('copy'); 
+            showToast("報告レジュメをコピーしました！", "copy");
         }
 
         function showToast(msg, icon) {
@@ -372,6 +785,7 @@
             document.getElementById('toast-message').textContent = msg;
             document.getElementById('toast-icon').setAttribute('data-lucide', icon);
             lucide.createIcons();
+            
             t.classList.remove('translate-y-20', 'opacity-0');
             t.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
