@@ -25,7 +25,7 @@
 
 <body class="h-full flex flex-col text-slate-800">
 
-    <!-- ヘッダー (メンバー/管理者で切り替わるプレミアムな配色のナビゲーション) -->
+    <!-- ヘッダー (メンバー/管理者で切り替わるナビゲーション) -->
     <header class="bg-gradient-to-r from-teal-800 to-indigo-900 text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -59,17 +59,16 @@
     <!-- メインレイアウトコンテナ -->
     <main class="flex-1 w-full mx-auto px-3 py-6 sm:px-6 lg:px-8 flex flex-col gap-6" id="main-layout-container">
 
-        <!-- 管理者モードでのみ表示されるおさらい・コンテキストエリア -->
+        <!-- 管理者カード -->
         <div id="context-card"
             class="hidden bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 flex-col md:flex-row gap-3 items-start md:items-center justify-between">
             <div class="flex gap-3">
-                <div class="p-2 bg-emerald-500 text-white rounded-lg hidden md:block">
-                    <i data-lucide="info" class="w-5 h-5"></i>
-                </div>
+                <div class="p-2 bg-emerald-500 text-white rounded-lg hidden md:block"><i data-lucide="info"
+                        class="w-5 h-5"></i></div>
                 <div class="space-y-0.5">
                     <h2 class="text-emerald-900 font-bold text-xs sm:text-sm">第2回『DX推進ネットワーク（7/17）』推進ダッシュボード</h2>
                     <p class="text-[11px] sm:text-xs text-emerald-700 leading-relaxed">
-                        メンバーから届いた現場の課題は、クラウド（ブラウザ内ストレージ）へ自動集計されています。集約データを活用し、次回の推進ネットワークミーティング用の報告ドキュメントも一瞬で自動作成可能です。
+                        メンバーからの送信データ、およびスプレッドシート（Web公開CSV）の管理情報を<b>リアルタイムで完全自動集計</b>しています。
                     </p>
                 </div>
             </div>
@@ -91,6 +90,26 @@
                 class="tab-btn flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-medium rounded-lg text-slate-600 hover:bg-slate-100"
                 disabled>
                 <i data-lucide="file-text" class="w-3.5 h-3.5"></i><span>📝 費用対効果 報告書作成</span>
+            </button>
+        </div>
+
+        <!-- メンバー認証用ロック画面 (セキュリティ用) -->
+        <div id="member-lock-screen"
+            class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-4 max-w-md mx-auto my-12 animate-in fade-in duration-200">
+            <div class="p-4 bg-emerald-50 text-emerald-600 rounded-full">
+                <i data-lucide="shield-alert" class="w-10 h-10"></i>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">環境事業部 メンバー限定アクセス</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                本アプリは環境事業部・維持管理メンバー専用です。<br>配布されたアクセスキーを入力してください。
+            </p>
+            <div class="w-full mt-2">
+                <input type="password" id="member-access-key-input" placeholder="アクセスキーを入力"
+                    class="w-full text-center text-sm border rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <button onclick="checkMemberAccessKey()"
+                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs transition-all shadow-sm">
+                認証してフォームを開く
             </button>
         </div>
 
@@ -166,7 +185,7 @@
                     </div>
 
                     <div class="flex flex-wrap gap-1.5 py-1">
-                        <span class="text-[11px] text-slate-500 font-bold self-center">💡 記入例をワンタップでセット：</span>
+                        <span class="text-[11px] text-slate-500 font-bold self-center">💡 記入例：</span>
                         <button onclick="insertExample(1)"
                             class="text-[10px] sm:text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-full border">メーター点検の二重入力</button>
                         <button onclick="insertExample(2)"
@@ -196,21 +215,26 @@
                                     class="w-4 h-4"></i></span>
                             月別・優先順位管理ダッシュボード
                         </h3>
-                        <!-- 月別フィルター -->
-                        <select id="month-filter" onchange="filterDataByMonth()"
-                            class="text-xs border border-slate-300 rounded-lg p-2 font-bold outline-none bg-slate-50 text-slate-700 focus:ring-2 focus:ring-indigo-500">
-                            <option value="all">📊 全月すべてのデータを表示</option>
-                            <option value="2026-07" selected>🗓️ 2026年 7月度分</option>
-                            <option value="2026-06">🗓️ 2026年 6月度分</option>
-                        </select>
+                        <div class="flex items-center gap-2">
+                            <button onclick="fetchLatestSheetData()"
+                                class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"
+                                    id="sync-icon-spin"></i><span>シートから自動同期</span>
+                            </button>
+                            <select id="month-filter" onchange="filterDataByMonth()"
+                                class="text-xs border border-slate-300 rounded-lg p-2 font-bold outline-none bg-slate-50 text-slate-700 focus:ring-2 focus:ring-indigo-500">
+                                <option value="all">📊 全月すべてのデータを表示</option>
+                                <option value="2026-07" selected>🗓️ 2026年 7月度分</option>
+                                <option value="2026-06">🗓️ 2026年 6月度分</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- サマリー統計カード (内訳カウンターをこちらに美しく完全統合) -->
+                    <!-- サマリー統計カード -->
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
                         <div class="bg-slate-50 border p-3 rounded-xl text-center flex flex-col justify-between h-24">
                             <span class="text-[10px] font-bold text-slate-500 block">総受付件数</span>
                             <span id="stat-total" class="text-lg sm:text-2xl font-black text-slate-900">0</span>
-                            <!-- 分類の内訳をサマリーに融合させてスマート表示 -->
                             <div class="text-[9px] text-slate-400 font-semibold mt-1">
                                 手間:<span id="count-type-1" class="text-amber-600 font-bold mx-0.5">0</span>
                                 課題:<span id="count-type-2" class="text-rose-600 font-bold mx-0.5">0</span>
@@ -257,7 +281,6 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-slate-100" id="table-body">
-                                    <!-- リアルタイムデータ -->
                                 </tbody>
                             </table>
                         </div>
@@ -296,7 +319,7 @@
                                     class="w-4 h-4"></i></span>
                             想定削減時間 ＆ 人件費削減効果 報告書自動生成
                         </h3>
-                        <p class="text-xs text-slate-500 mt-1">現場の「生の声」の件数に基づき、改善によって削れる人件費や年間削減時間を自動計算した報告書です。</p>
+                        <p class="text-xs text-slate-500 mt-1">削減時間やコスト削減額を連動計算した役員報告書です。</p>
                     </div>
                     <div class="bg-indigo-50/50 border border-indigo-150 rounded-xl p-4 flex flex-col gap-3">
                         <div class="flex justify-between items-center">
@@ -315,6 +338,58 @@
 
             <!-- 右サイドバー -->
             <div class="flex flex-col gap-4 sm:gap-6 hidden" id="sidebar-container">
+                <!-- Google自動連携設定パネル -->
+                <div
+                    class="bg-slate-900 text-slate-100 rounded-2xl p-4 flex flex-col gap-3.5 text-xs border border-slate-800 shadow-lg">
+                    <div class="border-b border-slate-800 pb-1 text-emerald-400 font-bold flex items-center gap-1.5"><i
+                            data-lucide="settings"></i>Googleクラウド連携設定</div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] text-slate-400 font-bold mb-1">① Google フォーム送信先URL</label>
+                            <input type="password" id="cfg-form-url"
+                                placeholder="https://docs.google.com/forms/u/0/d/e/.../formResponse"
+                                class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 outline-none focus:border-emerald-500">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <div>
+                                <label class="block text-[8px] text-slate-400 font-bold mb-0.5">お名前ID</label>
+                                <input type="text" id="cfg-entry-name" placeholder="entry.913..."
+                                    class="w-full bg-slate-800 border border-slate-700 rounded px-1.5 py-1 text-slate-200 text-[10px] outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[8px] text-slate-400 font-bold mb-0.5">業務ID</label>
+                                <input type="text" id="cfg-entry-job" placeholder="entry.184..."
+                                    class="w-full bg-slate-800 border border-slate-700 rounded px-1.5 py-1 text-slate-200 text-[10px] outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[8px] text-slate-400 font-bold mb-0.5">内容ID</label>
+                                <input type="text" id="cfg-entry-content" placeholder="entry.185..."
+                                    class="w-full bg-slate-800 border border-slate-700 rounded px-1.5 py-1 text-slate-200 text-[10px] outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 font-bold mb-1">② スプレッドシート公開CSV URL</label>
+                            <input type="password" id="cfg-csv-url"
+                                placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv"
+                                class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 font-bold mb-1">③
+                                メンバー用アクセスキー（空欄でロック解除）</label>
+                            <input type="text" id="cfg-member-key" placeholder="例：kankyo2026"
+                                class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 font-bold mb-1">④ 労務単価 (時給円換算)</label>
+                            <input type="number" id="cfg-labour-price" value="2500"
+                                class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 outline-none focus:border-emerald-500">
+                        </div>
+                        <button onclick="saveAdminSettings()"
+                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded shadow-sm text-xs">連携設定を安全に保存</button>
+                    </div>
+                </div>
+
                 <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
                     <h4 class="text-xs font-bold text-slate-900 flex items-center gap-1.5 border-b pb-2"><i
                             data-lucide="qr-code" class="w-4 h-4 text-teal-600"></i>スマホ共有用QRコード</h4>
@@ -325,18 +400,6 @@
                         <input type="text" id="site-url-input" oninput="generateQRCode()" placeholder="NetlifyのURLを入力"
                             class="text-[10px] text-center w-full border rounded px-2 py-1 outline-none bg-white">
                     </div>
-                </div>
-
-                <div
-                    class="bg-slate-900 text-slate-100 rounded-2xl p-4 flex flex-col gap-3 text-xs border border-slate-800">
-                    <div class="border-b border-slate-800 pb-1 text-emerald-400 font-bold flex items-center gap-1"><i
-                            data-lucide="refresh-cw"></i>スプレッドシート手動同期</div>
-                    <p class="text-[10px] text-slate-400">
-                        Googleスプレッドシートからコピーした中身全体をここに貼り付けると、月別データや優先度がダッシュボードに反映・同期されます。</p>
-                    <textarea id="sheet-paste-area" rows="3" placeholder="シートの行をまとめてここに貼り付け"
-                        class="w-full p-2 bg-slate-800 border border-slate-700 rounded text-[10px] outline-none text-slate-200 focus:border-emerald-500"></textarea>
-                    <button onclick="syncPastedSheetData()"
-                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 rounded text-[10px]">データを同期・再計算</button>
                 </div>
             </div>
         </div>
@@ -349,23 +412,25 @@
         </div>
     </footer>
 
-    <!-- モーダル -->
+    <!-- 管理者用ログインモーダル -->
     <div id="login-modal"
         class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3">
             <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2"><i data-lucide="shield-check"
                     class="text-indigo-600"></i>アンバサダーモード認証</h3>
-            <input type="password" id="admin-password" placeholder="パスワードを入力(初期: dx2026)"
-                class="w-full text-sm border rounded-lg px-3 py-2.5 outline-none">
+            <p class="text-[11px] text-slate-500 leading-relaxed">管理者用の自動集計データベースおよび各種連携設定をアンロックします。</p>
+            <input type="password" id="admin-password" placeholder="パスワードを入力"
+                class="w-full text-sm border rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500">
             <div class="flex gap-2 mt-2">
-                <button onclick="closeLoginModal()" class="flex-1 text-xs border py-2 rounded-lg">戻る</button>
+                <button onclick="closeLoginModal()"
+                    class="flex-1 text-xs border py-2 rounded-lg hover:bg-slate-50">戻る</button>
                 <button onclick="checkAdminPassword()"
                     class="flex-1 text-xs bg-indigo-600 text-white font-bold py-2 rounded-lg">解除</button>
             </div>
         </div>
     </div>
 
-    <!-- トースト -->
+    <!-- トースト表示 -->
     <div id="toast"
         class="fixed bottom-5 right-5 bg-slate-900 text-white text-[11px] sm:text-xs px-4 py-3 rounded-xl shadow-2xl border transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2.5 z-50">
         <i data-lucide="info" class="w-4 h-4 text-emerald-400" id="toast-icon"></i><span id="toast-message"></span>
@@ -373,24 +438,87 @@
 
     <!-- スクリプト -->
     <script>
-        // 【★Google フォーム連携用設定★】ユーザー様が抽出した実際のキーをここに完全にセットしています
-        const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLScfIa80deiHeYvgI8zfiYfyIBx-TC7tNVcQOnDAd-SPseymeA/formResponse";
-        const ENTRY_ID_NAME = "entry.913641658";
-        const ENTRY_ID_JOB = "entry.1840435080";
-        const ENTRY_ID_CONTENT = "entry.1857992662";
+        // ==========================================
+        // 【★ 1. グローバル関数と初期化 ★】
+        // ==========================================
+
+        // ラジオボタン（手間/課題/希望）のビジュアルスタイルを更新
+        function updateRadioStyles() {
+            const types = document.getElementsByName('mem-type');
+            types.forEach((type, index) => {
+                const label = document.getElementById('label-type-' + (index + 1));
+                if (label) {
+                    label.className = type.checked ? "border-2 border-emerald-500 bg-emerald-50 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer text-center scale-105 transition-all font-bold text-emerald-900" : "border border-slate-200 bg-white rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 text-center text-slate-600";
+                }
+            });
+        }
 
         const ADMIN_PWD_HASH = "dx2026";
+        const DEFAULT_DAYS_PER_MONTH = 20;
+
+        // 現場のお悩み分類ごとの初期削減値
+        const DEFAULT_REDUCTION_PARAMS = {
+            "手間": { timeSaved: 30 },
+            "困りごと": { timeSaved: 60 },
+            "希望": { timeSaved: 45 }
+        };
+
         let isAuthorized = false;
         let masterFeedbackData = [];
 
         window.onload = function () {
             lucide.createIcons();
+
+            // メンバー用パスワードロック状態の判定
+            checkMemberSecurityState();
+
+            // 管理者モードの復元
+            if (sessionStorage.getItem('dx_ambassador_authed') === 'true') {
+                authorizeAdmin(true);
+            } else {
+                updateLayout();
+            }
+
+            loadInitialData();
             updateRadioStyles();
-            if (sessionStorage.getItem('dx_ambassador_authed') === 'true') authorizeAdmin(true);
-            loadInitialMockData();
         };
 
-        function loadInitialMockData() {
+        // メンバー用パスワード制限キーの認証チェック
+        function checkMemberSecurityState() {
+            const configuredKey = localStorage.getItem('dx_cfg_member_key') || "kankyo2026"; // デフォルトメンバーキー
+            const isVerified = sessionStorage.getItem('dx_member_verified') === 'true';
+
+            // もし設定キーが空ならロック不要
+            if (!configuredKey) {
+                document.getElementById('member-lock-screen').classList.add('hidden');
+                document.getElementById('content-member').classList.remove('hidden');
+                return;
+            }
+
+            if (isVerified || isAuthorized) {
+                document.getElementById('member-lock-screen').classList.add('hidden');
+                document.getElementById('content-member').classList.remove('hidden');
+            } else {
+                document.getElementById('member-lock-screen').classList.remove('hidden');
+                document.getElementById('content-member').classList.add('hidden');
+            }
+        }
+
+        // メンバーパスワードの照合
+        function checkMemberAccessKey() {
+            const configuredKey = localStorage.getItem('dx_cfg_member_key') || "kankyo2026";
+            const inputVal = document.getElementById('member-access-key-input').value.trim();
+
+            if (inputVal === configuredKey) {
+                sessionStorage.setItem('dx_member_verified', 'true');
+                showToast("認証成功！お悩み入力窓口を開きました。", "unlock");
+                checkMemberSecurityState();
+            } else {
+                showToast("アクセスキーが違います！正しいキーを入力してください。", "alert-octagon");
+            }
+        }
+
+        function loadInitialData() {
             const stored = localStorage.getItem('dx_master_feedbacks');
             if (stored) {
                 masterFeedbackData = JSON.parse(stored);
@@ -398,12 +526,146 @@
                 masterFeedbackData = [
                     { date: "2026-07-05", name: "山田 健一", job: "維持管理（第一処理場）", type: "手間（面倒なこと）", content: "定時点検でメーター数値を手帳にメモして戻ってからExcelへ再入力。二度手間で面倒。", priority: "高", status: "未対応", timeSaved: 45, costSaved: 1875 },
                     { date: "2026-07-06", name: "佐藤 美香", job: "事務（環境管理部）", type: "困りごと（負担・課題）", content: "各現場提出のデータを役所指定フォーマット（産廃排出報告資料）に手動集計するのが大きな負担。", priority: "高", status: "対応中", timeSaved: 60, costSaved: 2500 },
-                    { date: "2026-07-07", name: "高橋 誠", job: "施設管理課", type: "希望（改善アイデア）", content: "毎日100枚以上撮影する確認写真を1枚ずつ手動リネーム・フォルダ保存している。自動化希望。", priority: "中", status: "解決済", timeSaved: 30, costSaved: 1250 },
-                    { date: "2026-06-18", name: "鈴木 次郎", job: "維持管理（第二クリーンセンター）", type: "手間（面倒なこと）", content: "日報報告用のデータ転記作業。複数ファイルを開いて閉じるのが大変。", priority: "低", status: "解決済", timeSaved: 20, costSaved: 833 }
+                    { date: "2026-07-07", name: "高橋 誠", job: "施設管理課", type: "希望（改善アイデア）", content: "毎日100枚以上撮影する確認写真を1枚ずつ手動リネーム・フォルダ保存している。自動化希望。", priority: "中", status: "解決済", timeSaved: 30, costSaved: 1250 }
                 ];
                 localStorage.setItem('dx_master_feedbacks', JSON.stringify(masterFeedbackData));
             }
             filterDataByMonth();
+        }
+
+        // ネットからGoogle CSVデータを自動フェッチ（リアルタイム同期）
+        function fetchLatestSheetData() {
+            const csvUrl = localStorage.getItem('dx_cfg_csv_url');
+            if (!csvUrl) {
+                showToast("シート連携設定（CSV URL）が未登録です！", "alert-circle");
+                return;
+            }
+
+            const syncIcon = document.getElementById('sync-icon-spin');
+            if (syncIcon) syncIcon.classList.add('animate-spin');
+
+            fetch(csvUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error("CORS or Network Error");
+                    return res.text();
+                })
+                .then(csvText => {
+                    const parsed = parseCSV(csvText);
+                    if (parsed.length > 1) {
+                        syncAndOverwriteLocalData(parsed);
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch Error:", err);
+                    showToast("同期に失敗。公開設定とURLを確認してください。", "alert-octagon");
+                })
+                .finally(() => {
+                    if (syncIcon) syncIcon.classList.remove('animate-spin');
+                });
+        }
+
+        function syncAndOverwriteLocalData(lines) {
+            const newList = [];
+            const labourPrice = Number(localStorage.getItem('dx_cfg_labour_price')) || 2500;
+
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i];
+                if (cols.length >= 4) {
+                    let dateStr = "2026-07-07";
+                    if (cols[0] && (cols[0].includes('-') || cols[0].includes('/'))) {
+                        const datePart = cols[0].split(' ')[0];
+                        if (datePart.includes('/')) {
+                            const p = datePart.split('/');
+                            dateStr = `${p[0]}-${p[1].padStart(2, '0')}-${p[2].padStart(2, '0')}`;
+                        } else {
+                            dateStr = datePart;
+                        }
+                    }
+
+                    let contentRaw = cols[3] || "";
+                    let type = "手間（面倒なこと）";
+                    if (contentRaw.startsWith('【')) {
+                        const endIdx = contentRaw.indexOf('】');
+                        if (endIdx !== -1) {
+                            type = contentRaw.substring(1, endIdx);
+                            contentRaw = contentRaw.substring(endIdx + 1).trim();
+                        }
+                    }
+
+                    const cleanType = type.includes('手間') ? '手間' : type.includes('困りごと') ? '困りごと' : '希望';
+                    const defaultMinutes = DEFAULT_REDUCTION_PARAMS[cleanType].timeSaved;
+
+                    newList.push({
+                        date: dateStr,
+                        name: cols[1] || "匿名",
+                        job: cols[2] || "未特定",
+                        type: type,
+                        content: contentRaw,
+                        priority: cols[4] || "中",
+                        status: cols[5] || "未対応",
+                        timeSaved: Number(cols[6]) || defaultMinutes,
+                        costSaved: ((Number(cols[6]) || defaultMinutes) / 60) * labourPrice
+                    });
+                }
+            }
+
+            if (newList.length > 0) {
+                masterFeedbackData = newList;
+                localStorage.setItem('dx_master_feedbacks', JSON.stringify(masterFeedbackData));
+                filterDataByMonth();
+                showToast(`スプレッドシート(${newList.length}件)から最新情報を自動取得しました！`, "check");
+            }
+        }
+
+        function parseCSV(text) {
+            let lines = [];
+            let row = [""];
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i + 1];
+                if (c === '"') {
+                    if (inQuotes && next === '"') { row[row.length - 1] += '"'; i++; }
+                    else { inQuotes = !inQuotes; }
+                } else if (c === ',' && !inQuotes) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    lines.push(row);
+                    row = [''];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') lines.push(row);
+            return lines;
+        }
+
+        function saveAdminSettings() {
+            const formUrl = document.getElementById('cfg-form-url').value.trim();
+            const entryName = document.getElementById('cfg-entry-name').value.trim();
+            const entryJob = document.getElementById('cfg-entry-job').value.trim();
+            const entryContent = document.getElementById('cfg-entry-content').value.trim();
+            const csvUrl = document.getElementById('cfg-csv-url').value.trim();
+            const memberKey = document.getElementById('cfg-member-key').value.trim();
+            const labourPrice = document.getElementById('cfg-labour-price').value.trim();
+
+            if (formUrl) localStorage.setItem('dx_cfg_form_url', formUrl);
+            if (entryName) localStorage.setItem('dx_cfg_entry_name', entryName);
+            if (entryJob) localStorage.setItem('dx_cfg_entry_job', entryJob);
+            if (entryContent) localStorage.setItem('dx_cfg_entry_content', entryContent);
+            if (csvUrl) localStorage.setItem('dx_cfg_csv_url', csvUrl);
+
+            // メンバーキーの保存（空欄なら制限なし）
+            localStorage.setItem('dx_cfg_member_key', memberKey);
+            if (labourPrice) localStorage.setItem('dx_cfg_labour_price', labourPrice);
+
+            showToast("Google連携設定 ＆ 単価・キー設定を安全に保存しました！", "check-circle");
+
+            // 画面のロック状態をリフレッシュ
+            checkMemberSecurityState();
+            if (csvUrl) fetchLatestSheetData();
         }
 
         function filterDataByMonth() {
@@ -440,7 +702,7 @@
             const statHighPriorityEl = document.getElementById('stat-high-priority');
 
             if (dataList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400 font-bold">この月はまだデータがありません。スマホからお悩みを受付中です！</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400 font-bold">まだデータがありません。設定から公開CSVを同期するか、回答を送信してください。</td></tr>`;
                 if (countType1El) countType1El.textContent = "0";
                 if (countType2El) countType2El.textContent = "0";
                 if (countType3El) countType3El.textContent = "0";
@@ -458,6 +720,8 @@
             let totalHoursSaved = 0;
             let totalMoneySaved = 0;
 
+            const labourPrice = Number(localStorage.getItem('dx_cfg_labour_price')) || 2500;
+
             dataList.forEach(d => {
                 if (d.status === '未対応' || d.status === '対応中') unresolved++;
                 if (d.status === '解決済') resolved++;
@@ -467,8 +731,9 @@
                 if (d.type && d.type.includes('困りごと')) type2++;
                 if (d.type && d.type.includes('希望')) type3++;
 
-                totalHoursSaved += Number(d.timeSaved || 30) / 60;
-                totalMoneySaved += Number(d.costSaved || 1250);
+                const h = Number(d.timeSaved || 30) / 60;
+                totalHoursSaved += h;
+                totalMoneySaved += h * labourPrice;
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition-all text-xs";
@@ -495,7 +760,6 @@
                 tbody.appendChild(tr);
             });
 
-            // メトリクス表示更新 (安全なヌルチェック)
             if (countType1El) countType1El.textContent = type1;
             if (countType2El) countType2El.textContent = type2;
             if (countType3El) countType3El.textContent = type3;
@@ -506,8 +770,8 @@
             if (statResolvedEl) statResolvedEl.textContent = resolved;
             if (statHighPriorityEl) statHighPriorityEl.textContent = highPriority;
 
-            const monthlyHours = Math.round(totalHoursSaved * 20);
-            const monetarySuccess = Math.round(totalMoneySaved * 20);
+            const monthlyHours = Math.round(totalHoursSaved * DEFAULT_DAYS_PER_MONTH);
+            const monetarySuccess = Math.round(totalMoneySaved * DEFAULT_DAYS_PER_MONTH);
 
             generatePresentationScript(dataList, total, type1, type2, type3, monthlyHours, monetarySuccess, selectedMonth);
         }
@@ -518,6 +782,8 @@
                 const [y, m] = selectedMonth.split('-');
                 monthLabel = `${y}年 ${m}月度`;
             }
+
+            const labourPrice = Number(localStorage.getItem('dx_cfg_labour_price')) || 2500;
 
             let reportText = `第2回 DX推進ネットワークミーティング報告資料
 環境事業部 維持管理アンバサダー報告レジュメ
@@ -541,14 +807,14 @@
 ■ 2. DX・AX化による期待される『費用対効果』の概算予測
 --------------------------------------------------
 当部門の提出課題に基づき、システム化による「時間短縮効果」および「削減人件費」を試算しました。
-※（試算条件：現場1点検アクションあたり削減時間をもとに、1名20日稼働、労務単価2,500円/時で計算）
+※（試算条件：現場1点検アクションあたり削減時間をもとに、1名あたり月間 20 日稼働、労務単価 ${labourPrice.toLocaleString()} 円/時として連動計算）
 
-・【月間想定削減時間】： 合計 約 ${monthlyHours || 45} 時間 の業務短縮
-・【年間想定削減時間】： 合計 約 ${(monthlyHours || 45) * 12} 時間 （現場のゆとり創出）
+・【月間想定削減時間】： 合計 約 ${monthlyHours || 0} 時間 の業務短縮
+・【年間想定削減時間】： 合計 約 ${(monthlyHours || 0) * 12} 時間 （現場のゆとり創出）
 
 💰【削減される想定人件費（コストカット効果）】
-  └ 月間削減額： 約 ${(moneySaved || 112500).toLocaleString()} 円 / 月
-  └ 年間削減額： 約 ${((moneySaved || 112500) * 12).toLocaleString()} 円 / 年 のコスト削減効果
+  └ 月間削減額： 約 ${(moneySaved || 0).toLocaleString()} 円 / 月
+  └ 年間削減額： 約 ${((moneySaved || 0) * 12).toLocaleString()} 円 / 年 の人件費削減効果
 
 ■ 3. 主要なお悩みのピックアップと優先改善要望
 --------------------------------------------------\n`;
@@ -561,10 +827,15 @@
             });
 
             reportText += `\n■ 4. 本部への具体的な提案
-1. 【最優先：計器メーター点検のペーパーレス化】
-   現場での手書きと事務所Excelへの二重打ち込みによる無駄を無くすため、現場入力用ミニアプリの導入を最優先で要望します。
-2. 【効果絶大：写真自動整理・リネームツールのチーム内展開】
-   毎日の写真仕分け作業を自動化し、これだけで月間数十時間のノンコア業務を削減します。
+1. 【計器点検メーター二重入力問題】
+   ⇒ 現場から一番多く挙がった「野帳の手書きメモ ＆ 帰社後のExcel再入力」を改善するため、
+      現場からスマホを用いて直接一発で入力・集計できる簡易データベースへの移行を提案します。
+
+2. 【効果逆算：写真自動整理・リネームツールのチーム内展開】
+   ⇒ 報告用に撮影された大量の写真を自動でファイルリネームし、仕分けする「自動リネーム＆整理ツール」のチーム内展開を要望します。
+
+3. 【産廃・マニフェスト集計業務のスマート化】
+   ⇒ 役所報告用（多量排出報告）の手動集計の削減に向けて、業者ごとにバラバラなデータをAIで自動読み取り・マージする仕組みの検証を進めます。
 
 ---
 以上、環境事業部 報告`;
@@ -572,9 +843,19 @@
             const rArea = document.getElementById('generated-report-area');
             if (rArea) rArea.value = reportText;
         }
-x
-        // Googleフォームへの直接非同期送信
+
+        // Google フォーム送信
         function submitToGoogleForm() {
+            const formUrl = localStorage.getItem('dx_cfg_form_url');
+            const entryName = localStorage.getItem('dx_cfg_entry_name');
+            const entryJob = localStorage.getItem('dx_cfg_entry_job');
+            const entryContent = localStorage.getItem('dx_cfg_entry_content');
+
+            if (!formUrl || !entryName || !entryJob || !entryContent) {
+                showToast("Google フォームの設定が完了していません。管理者としてログインして設定を登録してください。", "alert-circle");
+                return;
+            }
+
             const name = document.getElementById('mem-name').value.trim();
             const job = document.getElementById('mem-job').value.trim();
             const content = document.getElementById('mem-content').value.trim();
@@ -587,44 +868,46 @@ x
             btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>送信中...</span>`;
             lucide.createIcons();
 
-            // 分類タグ（【手間】等）を内容の先頭に自動合成して送信
             const fullContent = `【${type}】 ${content}`;
 
             const formData = new FormData();
-            formData.append(ENTRY_ID_NAME, name);
-            formData.append(ENTRY_ID_JOB, job);
-            formData.append(ENTRY_ID_CONTENT, fullContent);
+            formData.append(entryName, name);
+            formData.append(entryJob, job);
+            formData.append(entryContent, fullContent);
 
-            fetch(GOOGLE_FORM_ACTION_URL, {
+            fetch(formUrl, {
                 method: "POST",
                 mode: "no-cors",
                 body: formData
             }).then(() => {
                 const today = new Date().toISOString().split('T')[0];
+                const cleanType = type.includes('手間') ? '手間' : type.includes('困りごと') ? '困りごと' : '希望';
+                const defaultMinutes = DEFAULT_REDUCTION_PARAMS[cleanType].timeSaved;
+                const labourPrice = Number(localStorage.getItem('dx_cfg_labour_price')) || 2500;
+
                 const newFeedback = {
                     date: today, name, job, type, content,
-                    priority: "中", status: "未対応", timeSaved: 30, costSaved: 1250
+                    priority: "中", status: "未対応", timeSaved: defaultMinutes, costSaved: (defaultMinutes / 60) * labourPrice
                 };
                 masterFeedbackData.unshift(newFeedback);
                 localStorage.setItem('dx_master_feedbacks', JSON.stringify(masterFeedbackData));
                 filterDataByMonth();
 
-                // チャットWebhookへも連動通知 (存在する場合)
                 sendWebhookNotification(newFeedback);
 
-                showToast("送信が完了しました！裏側のスプレッドシートへ自動集計されました。", "check");
+                showToast("送信が完了しました！Googleスプレッドシートへ自動集計されました。", "check");
                 clearMemberForm();
             }).catch(err => {
                 console.error(err);
-                showToast("送信エラーが発生しました。接続設定を確認してください。", "alert-circle");
+                showToast("送信エラーが発生しました。インターネット接続を確認してください。", "alert-circle");
             }).finally(() => {
                 btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i><span>クラウドへ自動送信</span>`;
+                btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i><span>データベースに自動送信</span>`;
                 lucide.createIcons();
             });
         }
 
-        // Webhook通知処理
+        // Webhook通知
         async function sendWebhookNotification(data) {
             const webhookUrl = localStorage.getItem('dx_webhook_url');
             if (!webhookUrl) return;
@@ -634,72 +917,19 @@ x
             };
 
             try {
-                await fetch(webhookUrl, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-            } catch (err) {
-                console.error("Webhook Send Error:", err);
-            }
+                await fetch(webhookUrl, { method: 'POST', body: JSON.stringify(payload) });
+            } catch (err) { console.error(err); }
         }
 
-        // スプレッドシートからのコピペデータのパースと同期
+        // スプレッドシート手動パース同期 (フォールバック用)
         function syncPastedSheetData() {
             const rawText = document.getElementById('sheet-paste-area').value.trim();
-            if (!rawText) { showToast("貼り付けエリアが空です", "alert-circle"); return; }
-
-            const lines = rawText.split('\n');
-            const newParsedList = [];
-
-            lines.forEach(line => {
-                const cols = line.split('\t');
-                if (cols.length >= 4) {
-                    let dateStr = "2026-07-07";
-                    if (cols[0].includes('-') || cols[0].includes('/')) {
-                        const datePart = cols[0].split(' ')[0];
-                        if (datePart.includes('/')) {
-                            const parts = datePart.split('/');
-                            dateStr = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
-                        } else {
-                            dateStr = datePart;
-                        }
-                    }
-
-                    let contentRaw = cols[3] || "";
-                    let type = "手間（面倒なこと）";
-                    if (contentRaw.startsWith('【')) {
-                        const endIdx = contentRaw.indexOf('】');
-                        if (endIdx !== -1) {
-                            type = contentRaw.substring(1, endIdx);
-                            contentRaw = contentRaw.substring(endIdx + 1).trim();
-                        }
-                    }
-
-                    newParsedList.push({
-                        date: dateStr, name: cols[1], job: cols[2], type: type, content: contentRaw,
-                        priority: cols[4] || "中", status: cols[5] || "未対応",
-                        timeSaved: Number(cols[6] || 30), costSaved: Number(cols[7] || 1250)
-                    });
-                }
-            });
-
-            if (newParsedList.length > 0) {
-                masterFeedbackData = newParsedList;
-                localStorage.setItem('dx_master_feedbacks', JSON.stringify(masterFeedbackData));
-                filterDataByMonth();
-                showToast(`${newParsedList.length}件のスプレッドシートデータと同期しました！`, "check");
+            if (!rawText) return;
+            const parsed = parseCSV(rawText.replace(/\t/g, ','));
+            if (parsed.length > 0) {
+                syncAndOverwriteLocalData(parsed);
                 document.getElementById('sheet-paste-area').value = '';
             }
-        }
-
-        function updateRadioStyles() {
-            const types = document.getElementsByName('mem-type');
-            types.forEach((type, index) => {
-                const label = document.getElementById('label-type-' + (index + 1));
-                if (label) {
-                    label.className = type.checked ? "border-2 border-emerald-500 bg-emerald-50 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer text-center scale-105 transition-all font-bold text-emerald-900" : "border border-slate-200 bg-white rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 text-center text-slate-600";
-                }
-            });
         }
 
         function updateLayout() {
@@ -742,14 +972,18 @@ x
         function switchTab(tabId) {
             if (!isAuthorized && (tabId === 'ambassador' || tabId === 'report')) return;
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.className = "tab-btn flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-medium rounded-lg text-slate-600 hover:bg-slate-100");
+            document.querySelectorAll('.tab-btn').forEach(b => b.className = "tab-btn flex-1 min-w-[125px] flex items-center justify-center gap-1.5 py-2.5 px-2 text-xs font-medium rounded-lg text-slate-600 hover:bg-slate-100");
 
             const contentTab = document.getElementById('content-' + tabId);
             if (contentTab) contentTab.classList.remove('hidden');
 
             const tBtn = document.getElementById('tab-' + tabId);
             if (tBtn) {
-                tBtn.className = `tab-btn flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-bold rounded-lg text-white shadow-sm ${tabId === 'member' ? 'bg-emerald-600' : 'bg-indigo-600'}`;
+                tBtn.className = `tab-btn flex-1 min-w-[125px] flex items-center justify-center gap-1.5 py-2.5 px-2 text-xs font-bold rounded-lg text-white shadow-sm bg-indigo-600`;
+            }
+            if (tabId === 'member') {
+                const tMem = document.getElementById('tab-member');
+                if (tMem) tMem.className = "tab-btn flex-1 min-w-[125px] flex items-center justify-center gap-1.5 py-2.5 px-2 text-xs font-bold rounded-lg text-white shadow-sm bg-emerald-600";
             }
             if (tabId === 'report' || tabId === 'ambassador') filterDataByMonth();
         }
@@ -757,9 +991,9 @@ x
         function insertExample(id) {
             const jInput = document.getElementById('mem-job');
             const cInput = document.getElementById('mem-content');
-            if (id === 1 && jInput && cInput) { jInput.value = "維持管理（水再生センター）"; cInput.value = "メーター確認作業で数値を一度野帳に手書きし、事務所に戻ってからExcelへ手入力しています。二度手間で面倒なので、スマホから一発で入力・自動反映される仕組みにしたいです！"; document.getElementsByName('mem-type')[0].checked = true; }
-            if (id === 2 && jInput && cInput) { jInput.value = "プラント施設管理課"; cInput.value = "毎日100枚以上撮影する確認写真を、PCに取り込んだ後、1枚ずつ手動で名前変更・フォルダ仕分けしています。自動リネーム機能が欲しいです。"; document.getElementsByName('mem-type')[1].checked = true; }
-            if (id === 3 && jInput && cInput) { jInput.value = "産廃マニフェスト管理事務"; cInput.value = "各現場から集まる産廃マニフェスト伝票を、役所指定のフォーマット（多量排出報告書）に合わせて手動転記・集計するのが非常に負担です。"; document.getElementsByName('mem-type')[2].checked = true; }
+            if (id === 1 && jInput && cInput) { jInput.value = "維持管理（第一水再生センター）"; cInput.value = "計器メーター点検で、数値を一度野帳（手帳）に手書きし、事務所に戻ってからExcelの点検報告書に再入力しています。二度手間で面倒なので、現場でスマホから一発で入力できるように改善してほしいです！"; document.getElementsByName('mem-type')[0].checked = true; }
+            if (id === 2 && jInput && cInput) { jInput.value = "プラント施設管理課"; cInput.value = "現場で毎日100枚以上撮影する確認写真を、PCに取り込んだあと1枚ずつ手動で名前変更・仕分けしています。自動リネーム＆整理ツールが欲しいです。"; document.getElementsByName('mem-type')[1].checked = true; }
+            if (id === 3 && jInput && cInput) { jInput.value = "産廃マニフェスト管理事務"; jInput.value = "各現場から回収した産廃マニフェスト伝票を、役所指定フォーマット（多量排出報告書）に合わせて手動転記・集計するのが非常に負担です。"; document.getElementsByName('mem-type')[2].checked = true; }
             updateRadioStyles();
         }
 
@@ -805,7 +1039,7 @@ x
             if (loginBtnText) loginBtnText.textContent = "ログアウト";
             if (loginIcon) loginIcon.setAttribute('data-lucide', 'unlock');
             if (hTitle) hTitle.textContent = "環境事業部 DXアンバサダー・コンソール";
-            if (hSubtitle) hSubtitle.textContent = "月別集計ダッシュボード ＆ 削減人件費自動計算システム";
+            if (hSubtitle) hSubtitle.textContent = "月別集計ダッシュボード ＆ 費用対効果自動計算システム";
 
             ['tab-ambassador', 'tab-report'].forEach(id => {
                 const t = document.getElementById(id);
@@ -825,6 +1059,7 @@ x
             if (storedWebhook && wInput) wInput.value = storedWebhook;
 
             updateLayout();
+            checkMemberSecurityState(); // 画面ロックをリフレッシュ
             filterDataByMonth();
             lucide.createIcons();
             if (!isRestore) switchTab('ambassador');
@@ -837,7 +1072,7 @@ x
             const hTitle = document.getElementById('header-title');
             const hSubtitle = document.getElementById('header-subtitle');
 
-            if (loginBtnText) loginBtnText.textContent = "管理者用";
+            if (loginBtnText) loginBtnText.textContent = "管理者用ログイン";
             if (loginIcon) loginIcon.setAttribute('data-lucide', 'lock');
             if (hTitle) hTitle.textContent = "環境事業部 DXお悩み受付窓口";
             if (hSubtitle) hSubtitle.textContent = "現場の「生の声」を直接会社に届ける窓口";
@@ -851,6 +1086,7 @@ x
             });
 
             updateLayout();
+            checkMemberSecurityState(); // 一般のロック状態に戻す
             switchTab('member'); lucide.createIcons();
         }
 
@@ -874,7 +1110,7 @@ x
         function copyTableToClipboard() {
             const temp = document.createElement('textarea');
             let txt = "日付\t担当者\t担当業務\t分類\tお悩み・提案\t優先度\tステータス\t削減時間(分)\t削減額(円)\n";
-            masterFeedbackData.forEach(d => txt += `${d.date}\t${d.name}\t${d.job}\t${d.type}\t${d.content}\t${d.priority}\t${d.status}\t${d.timeSaved}\t${d.costSaved}\n`);
+            masterFeedbackData.forEach(d => txt += `${d.date}\t${d.name}\t${d.job}\t${d.type}\t${d.content}\t${d.priority || '中'}\t${d.status || '未対応'}\t${d.timeSaved || 30}\t${d.costSaved || 1250}\n`);
             temp.value = txt; document.body.appendChild(temp); temp.select();
             document.execCommand('copy'); document.body.removeChild(temp);
             showToast("Excel用に表データをコピーしました！", "copy");
@@ -903,6 +1139,10 @@ x
                 t.classList.remove('translate-y-0', 'opacity-100');
                 t.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
+        }
+        function updateRadioStyles() {
+            // ラジオボタンのデザインを切り替える処理
+            // （もしdx(3).htmlの末尾にこの名前の関数があれば、中身ごと丸ごと持ってきてください）
         }
     </script>
 </body>
