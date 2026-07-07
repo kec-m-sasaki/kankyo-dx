@@ -1,31 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja" class="h-full bg-slate-50">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>環境事業部 DXお悩み受付窓口</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
-
-        body {
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
     </style>
 </head>
-
 <body class="h-full flex flex-col text-slate-800">
 
-    <!-- ヘッダー (メンバー/管理者で切り替わるナビゲーション) -->
     <header class="bg-gradient-to-r from-teal-800 to-indigo-900 text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -33,1106 +21,357 @@
                     <i data-lucide="cpu" class="w-6 h-6 text-emerald-300"></i>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-bold tracking-tight" id="header-title">環境事業部 DXお悩み受付窓口</h1>
-                    <p class="text-[10px] sm:text-xs text-emerald-100/80" id="header-subtitle">現場の「生の声」を直接会社に届ける窓口</p>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight">環境事業部 DXお悩み受付窓口</h1>
+                    <p class="text-[10px] sm:text-xs text-emerald-100/80">現場の「生の声」を直接会社に届ける窓口</p>
                 </div>
             </div>
-
             <div class="flex items-center gap-2">
-                <!-- 管理者モードの時のみ表示するバッジ -->
-                <div id="status-badge"
-                    class="hidden items-center gap-1 text-[10px] bg-indigo-500/20 px-2.5 py-1 rounded-full text-indigo-200 border border-indigo-500/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
-                    <span>アンバサダーモード実行中</span>
-                </div>
-
-                <!-- アンバサダー認証ボタン -->
-                <button onclick="openLoginModal()" id="login-nav-btn"
-                    class="flex items-center gap-1 bg-white/10 hover:bg-white/20 active:bg-white/30 border border-white/20 text-[10px] sm:text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all">
-                    <i data-lucide="lock" class="w-3 h-3" id="login-icon"></i>
-                    <span id="login-btn-text">管理者用ログイン</span>
+                <button id="nav-btn" onclick="toggleMode()" class="text-xs font-medium bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-lg transition-all border border-white/10 flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                    <span id="nav-btn-text">管理者用ログイン</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- メインレイアウトコンテナ -->
-    <main class="flex-1 w-full mx-auto px-3 py-6 sm:px-6 lg:px-8 flex flex-col gap-6" id="main-layout-container">
+    <main class="flex-1 w-full max-w-7xl mx-auto px-3 py-6 sm:px-6 lg:px-8 flex flex-col gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-2 flex flex-col gap-6">
+                
+                <div id="content-member" class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-7 flex flex-col gap-5">
+                    
+                    <div id="member-auth-section" class="py-8 text-center flex flex-col items-center justify-center max-w-md mx-auto w-full gap-4">
+                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-1 shadow-sm">
+                            <i data-lucide="key-round" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800">アクセスキーを入力してください</h4>
+                        <div class="w-full flex gap-2 mt-2">
+                            <input type="text" id="access-key-input" placeholder="kankyo2026" class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center font-mono tracking-widest text-slate-800 focus:outline-none focus:border-teal-600">
+                            <button onclick="verifyAccessKey()" class="px-5 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1">
+                                <span>解除</span>
+                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
 
-        <!-- 管理者カード -->
-        <div id="context-card"
-            class="hidden bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 flex-col md:flex-row gap-3 items-start md:items-center justify-between">
-            <div class="flex gap-3">
-                <div class="p-2 bg-emerald-500 text-white rounded-lg hidden md:block"><i data-lucide="info"
-                        class="w-5 h-5"></i></div>
-                <div class="space-y-0.5">
-                    <h2 class="text-emerald-900 font-bold text-xs sm:text-sm">第2回『DX推進ネットワーク（7/17）』推進ダッシュボード</h2>
-                    <p class="text-[11px] sm:text-xs text-emerald-700 leading-relaxed">
-                        メンバーからの送信データ、およびスプレッドシート（Web公開CSV）の管理情報を<b>リアルタイムで完全自動集計</b>しています。
-                    </p>
+                    <form id="submission-form" onsubmit="handleFormSubmit(event)" class="hidden flex flex-col gap-5">
+                        <div class="border-b border-slate-100 pb-3 flex items-center gap-3">
+                            <div class="p-2 bg-emerald-50 text-emerald-700 rounded-xl">
+                                <i data-lucide="edit-3" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base sm:text-lg font-bold text-slate-900">現場の「ここが不便」をお聞かせください</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">皆様の日々の業務をラクにするための窓口です。</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">お名前 <span class="text-rose-500">*</span></label>
+                                <input type="text" id="mem-name" placeholder="例：鈴木 太郎" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-600" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">担当業務・施設名 <span class="text-rose-500">*</span></label>
+                                <input type="text" id="mem-job" placeholder="例：維持管理（〇〇浄化センター）" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-600" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-2">お悩みの分類 <span class="text-rose-500">*</span></label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <label class="radio-label border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 transition-all">
+                                    <input type="radio" name="mem-type" value="手間・面倒" class="sr-only" onchange="updateRadioStyles()" required>
+                                    <i data-lucide="hourglass" class="w-4 h-4 text-amber-500"></i>
+                                    <span class="text-[11px] font-bold text-slate-700">手間・面倒</span>
+                                </label>
+                                <label class="radio-label border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 transition-all">
+                                    <input type="radio" name="mem-type" value="困りごと・課題" class="sr-only" onchange="updateRadioStyles()" required>
+                                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-500"></i>
+                                    <span class="text-[11px] font-bold text-slate-700">困りごと・課題</span>
+                                </label>
+                                <label class="radio-label border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 transition-all">
+                                    <input type="radio" name="mem-type" value="希望・改善案" class="sr-only" onchange="updateRadioStyles()" required>
+                                    <i data-lucide="sparkles" class="w-4 h-4 text-indigo-500"></i>
+                                    <span class="text-[11px] font-bold text-slate-700">希望・改善案</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">具体的なお悩み、改善案 <span class="text-rose-500">*</span></label>
+                            <textarea id="mem-content" rows="4" placeholder="具体的な作業内容と、大変な理由をご記入ください。" class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:border-teal-600" required></textarea>
+                        </div>
+
+                        <div class="flex justify-end border-t border-slate-100 pt-4 mt-1">
+                            <button type="submit" class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5">
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                <span>データベースに自動送信</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </div>
-        </div>
 
-        <!-- タブナビゲーション (管理者モードでのみ表示) -->
-        <div id="tab-navigation-bar"
-            class="hidden border-b border-slate-200 bg-white rounded-xl shadow-sm p-1 gap-1 overflow-x-auto">
-            <button onclick="switchTab('member')" id="tab-member"
-                class="tab-btn flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-bold rounded-lg transition-all bg-emerald-600 text-white shadow-sm">
-                <i data-lucide="gift" class="w-3.5 h-3.5"></i><span>🎁 回答作成画面</span>
-            </button>
-            <button onclick="switchTab('ambassador')" id="tab-ambassador"
-                class="tab-btn flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-medium rounded-lg text-slate-600 hover:bg-slate-100"
-                disabled>
-                <i data-lucide="table-properties" class="w-3.5 h-3.5"></i><span>📊 月別集計ダッシュボード</span>
-            </button>
-            <button onclick="switchTab('report')" id="tab-report"
-                class="tab-btn flex-1 min-w-[120px] flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-medium rounded-lg text-slate-600 hover:bg-slate-100"
-                disabled>
-                <i data-lucide="file-text" class="w-3.5 h-3.5"></i><span>📝 費用対効果 報告書作成</span>
-            </button>
-        </div>
-
-        <!-- メンバー認証用ロック画面 (セキュリティ用) -->
-        <div id="member-lock-screen"
-            class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-10 flex flex-col items-center justify-center text-center gap-4 max-w-md mx-auto my-12 animate-in fade-in duration-200">
-            <div class="p-4 bg-emerald-50 text-emerald-600 rounded-full">
-                <i data-lucide="shield-alert" class="w-10 h-10"></i>
-            </div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-900">環境事業部 メンバー限定アクセス</h3>
-            <p class="text-xs text-slate-500 leading-relaxed">
-                本アプリは環境事業部・維持管理メンバー専用です。<br>配布されたアクセスキーを入力してください。
-            </p>
-            <div class="w-full mt-2">
-                <input type="password" id="member-access-key-input" placeholder="アクセスキーを入力"
-                    class="w-full text-center text-sm border rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
-            </div>
-            <button onclick="checkMemberAccessKey()"
-                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs transition-all shadow-sm">
-                認証してフォームを開く
-            </button>
-        </div>
-
-        <!-- コンテンツエリア -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="main-content-grid">
-
-            <!-- メインフォーム / 集計エリア -->
-            <div class="lg:col-span-2 flex flex-col gap-6" id="main-column-container">
-
-                <!-- タブ1: メンバー用回答送信画面 -->
-                <div id="content-member"
-                    class="tab-content bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-7 flex flex-col gap-5">
-                    <div class="border-b border-slate-100 pb-3 flex items-center gap-3">
-                        <span class="p-2 bg-emerald-50 text-emerald-700 rounded-xl hidden sm:block"><i
-                                data-lucide="edit-3" class="w-5 h-5"></i></span>
-                        <div>
-                            <h3 class="text-base sm:text-lg font-bold text-slate-900">現場の「ここが不便、こうして欲しい」をお聞かせください</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">皆様の日々の業務をラクにするための窓口です。送信された内容は自動集計されます。</p>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">お名前 <span
-                                    class="text-rose-500">*</span></label>
-                            <input type="text" id="mem-name" placeholder="例：鈴木 太郎"
-                                class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">担当業務・施設名 <span
-                                    class="text-rose-500">*</span></label>
-                            <input type="text" id="mem-job" placeholder="例：維持管理（〇〇浄化センター）"
-                                class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-2">お悩みの分類 <span
-                                class="text-rose-500">*</span></label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <label
-                                class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer text-center"
-                                id="label-type-1">
-                                <input type="radio" name="mem-type" value="手間（面倒なこと）" checked class="sr-only"
-                                    onchange="updateRadioStyles()">
-                                <i data-lucide="hourglass" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500"></i><span
-                                    class="text-xs font-bold">手間・面倒</span>
-                            </label>
-                            <label
-                                class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer text-center"
-                                id="label-type-2">
-                                <input type="radio" name="mem-type" value="困りごと（負担・課題）" class="sr-only"
-                                    onchange="updateRadioStyles()">
-                                <i data-lucide="alert-circle" class="w-4 h-4 sm:w-5 sm:h-5 text-rose-500"></i><span
-                                    class="text-xs font-bold">困りごと・課題</span>
-                            </label>
-                            <label
-                                class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer text-center"
-                                id="label-type-3">
-                                <input type="radio" name="mem-type" value="希望（改善アイデア）" class="sr-only"
-                                    onchange="updateRadioStyles()">
-                                <i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500"></i><span
-                                    class="text-xs font-bold">希望・改善案</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5">具体的なお悩み、または「こうなったら嬉しい」という改善案 <span
-                                class="text-rose-500">*</span></label>
-                        <textarea id="mem-content" rows="4" placeholder="具体的な作業内容と、大変な理由をご記入ください。"
-                            class="w-full text-sm border border-slate-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-                    </div>
-
-                    <div class="flex flex-wrap gap-1.5 py-1">
-                        <span class="text-[11px] text-slate-500 font-bold self-center">💡 記入例：</span>
-                        <button onclick="insertExample(1)"
-                            class="text-[10px] sm:text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-full border">メーター点検の二重入力</button>
-                        <button onclick="insertExample(2)"
-                            class="text-[10px] sm:text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-full border">毎日大量の写真整理</button>
-                        <button onclick="insertExample(3)"
-                            class="text-[10px] sm:text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-full border">マニフェスト集計事務</button>
-                    </div>
-
-                    <div
-                        class="border-t border-slate-100 pt-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-                        <button onclick="clearMemberForm()"
-                            class="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1 py-2"><i
-                                data-lucide="trash-2" class="w-3.5 h-3.5"></i>クリア</button>
-                        <button onclick="submitToGoogleForm()" id="btn-submit-db"
-                            class="w-full sm:w-auto sm:min-w-[220px] bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold text-xs sm:text-sm py-3 rounded-lg shadow-md flex items-center justify-center gap-2 transition-all">
-                            <i data-lucide="send" class="w-4 h-4"></i><span>クラウドへ自動送信</span>
+                <div id="content-admin" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col gap-5">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5 text-indigo-600"></i>月別・優先順位管理ダッシュボード
+                        </h3>
+                        <button onclick="syncWithGoogleSheet()" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200 flex items-center gap-1">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="sync-icon"></i>シートから同期
                         </button>
                     </div>
-                </div>
 
-                <!-- タブ2: アンバサダー用自動集計画面 -->
-                <div id="content-ambassador"
-                    class="tab-content bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col gap-4 sm:gap-5 hidden">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b pb-3 gap-2">
-                        <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <span class="p-1 bg-indigo-100 text-indigo-700 rounded-md"><i data-lucide="table"
-                                    class="w-4 h-4"></i></span>
-                            月別・優先順位管理ダッシュボード
-                        </h3>
-                        <div class="flex items-center gap-2">
-                            <button onclick="fetchLatestSheetData()"
-                                class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1">
-                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"
-                                    id="sync-icon-spin"></i><span>シートから自動同期</span>
-                            </button>
-                            <select id="month-filter" onchange="filterDataByMonth()"
-                                class="text-xs border border-slate-300 rounded-lg p-2 font-bold outline-none bg-slate-50 text-slate-700 focus:ring-2 focus:ring-indigo-500">
-                                <option value="all">📊 全月すべてのデータを表示</option>
-                                <option value="2026-07" selected>🗓️ 2026年 7月度分</option>
-                                <option value="2026-06">🗓️ 2026年 6月度分</option>
-                            </select>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl text-center">
+                            <p class="text-[10px] font-bold text-slate-500">総受付件数</p>
+                            <p class="text-2xl font-extrabold text-slate-800" id="card-total">0</p>
+                        </div>
+                        <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl text-center">
+                            <p class="text-[10px] font-bold text-rose-600">未対応・検討中</p>
+                            <p class="text-2xl font-extrabold text-rose-700" id="card-pending">0</p>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-center">
+                            <p class="text-[10px] font-bold text-emerald-600">解決・対応済み</p>
+                            <p class="text-2xl font-extrabold text-emerald-700" id="card-solved">0</p>
                         </div>
                     </div>
 
-                    <!-- サマリー統計カード -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
-                        <div class="bg-slate-50 border p-3 rounded-xl text-center flex flex-col justify-between h-24">
-                            <span class="text-[10px] font-bold text-slate-500 block">総受付件数</span>
-                            <span id="stat-total" class="text-lg sm:text-2xl font-black text-slate-900">0</span>
-                            <div class="text-[9px] text-slate-400 font-semibold mt-1">
-                                手間:<span id="count-type-1" class="text-amber-600 font-bold mx-0.5">0</span>
-                                課題:<span id="count-type-2" class="text-rose-600 font-bold mx-0.5">0</span>
-                                提案:<span id="count-type-3" class="text-indigo-600 font-bold mx-0.5">0</span>
-                            </div>
-                        </div>
-                        <div
-                            class="bg-rose-50 border border-rose-100 p-3 rounded-xl text-center flex flex-col justify-center h-24">
-                            <span
-                                class="text-[10px] font-bold text-rose-700 block flex items-center justify-center gap-1"><i
-                                    data-lucide="alert-circle" class="w-3 h-3"></i>未対応・検討中</span>
-                            <span id="stat-unresolved"
-                                class="text-lg sm:text-2xl font-black text-rose-900 mt-1">0</span>
-                        </div>
-                        <div
-                            class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl text-center flex flex-col justify-center h-24">
-                            <span
-                                class="text-[10px] font-bold text-emerald-700 block flex items-center justify-center gap-1"><i
-                                    data-lucide="check-circle" class="w-3 h-3"></i>解決・対応済み</span>
-                            <span id="stat-resolved"
-                                class="text-lg sm:text-2xl font-black text-emerald-900 mt-1">0</span>
-                        </div>
-                        <div
-                            class="bg-amber-50 border border-amber-100 p-3 rounded-xl text-center flex flex-col justify-center h-24">
-                            <span
-                                class="text-[10px] font-bold text-amber-700 block flex items-center justify-center gap-1"><i
-                                    data-lucide="zap" class="w-3 h-3"></i>最優先(高ランク)</span>
-                            <span id="stat-high-priority"
-                                class="text-lg sm:text-2xl font-black text-amber-900 mt-1">0</span>
-                        </div>
-                    </div>
-
-                    <!-- メインデータテーブル -->
-                    <div class="border border-slate-200 rounded-xl shadow-inner bg-white overflow-hidden">
-                        <div class="overflow-x-auto max-h-96">
-                            <table class="min-w-full divide-y divide-slate-200 text-xs text-left" id="summary-table">
-                                <thead class="bg-slate-100 sticky top-0">
-                                    <tr>
-                                        <th class="px-2 py-3 font-bold text-slate-600 border-b w-16">優先度</th>
-                                        <th class="px-2 py-3 font-bold text-slate-600 border-b w-20">ステータス</th>
-                                        <th class="px-3 py-3 font-bold text-slate-600 border-b w-20">担当者</th>
-                                        <th class="px-3 py-3 font-bold text-slate-600 border-b w-32">施設・業務名</th>
-                                        <th class="px-3 py-3 font-bold text-slate-600 border-b">お悩み・改善案の内容</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-slate-100" id="table-body">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Webhook 通知設定 -->
-                    <div class="border-t border-slate-150 pt-4">
-                        <div class="bg-slate-100 border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
-                            <div class="space-y-0.5">
-                                <h4 class="text-xs font-bold text-slate-900 flex items-center gap-1">
-                                    <i data-lucide="bell" class="w-4 h-4 text-teal-600"></i>
-                                    Google Chat 通知用 Webhook URL 設定
-                                </h4>
-                                <p class="text-[11px] text-slate-500">Google Chatスペースで発行したWebhook URLを貼り付け、保存を押してください。
-                                </p>
-                            </div>
-                            <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="webhook-url-input"
-                                    placeholder="https://chat.googleapis.com/v1/spaces/..."
-                                    class="flex-1 text-xs border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-1 focus:ring-teal-500">
-                                <button onclick="saveWebhookSettings()"
-                                    class="bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs px-5 py-2.5 rounded-lg transition-all flex items-center justify-center gap-1">
-                                    <i data-lucide="save" class="w-3.5 h-3.5"></i>設定を保存
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- タブ3: 費用対効果 報告書作成 -->
-                <div id="content-report"
-                    class="tab-content bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col gap-4 sm:gap-5 hidden">
-                    <div>
-                        <h3 class="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <span class="p-1 bg-indigo-100 text-indigo-700 rounded-md"><i data-lucide="file-text"
-                                    class="w-4 h-4"></i></span>
-                            想定削減時間 ＆ 人件費削減効果 報告書自動生成
-                        </h3>
-                        <p class="text-xs text-slate-500 mt-1">削減時間やコスト削減額を連動計算した役員報告書です。</p>
-                    </div>
-                    <div class="bg-indigo-50/50 border border-indigo-150 rounded-xl p-4 flex flex-col gap-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-indigo-900" id="report-month-title">選択月度 報告レジュメ</span>
-                            <button onclick="copyGeneratedReport()"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
-                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>レジュメを丸ごとコピー
-                            </button>
-                        </div>
-                        <textarea id="generated-report-area" rows="14"
-                            class="w-full text-xs font-mono border border-indigo-200 rounded-lg p-3 bg-white outline-none leading-relaxed text-slate-700"
-                            readonly></textarea>
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-100 text-slate-600">
+                                <tr>
+                                    <th class="p-3">お名前</th>
+                                    <th class="p-3">担当業務</th>
+                                    <th class="p-3">分類</th>
+                                    <th class="p-3">お悩み内容</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-table-body" class="bg-white divide-y divide-slate-200">
+                                <tr>
+                                    <td colspan="4" class="p-8 text-center text-slate-400">シートから同期を押してください。</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- 右サイドバー -->
-            <div class="flex flex-col gap-4 sm:gap-6 hidden" id="sidebar-container">
-                <!-- Google自動連携設定パネル -->
-                <div
-                    class="bg-slate-900 text-slate-100 rounded-2xl p-4 flex flex-col gap-3.5 text-xs border border-slate-800 shadow-lg">
-                    <div class="border-b border-slate-800 pb-1 text-emerald-400 font-bold flex items-center gap-1.5"><i
-                            data-lucide="settings"></i>Googleクラウド連携設定</div>
+            <div class="flex flex-col gap-4">
+                
+                <div id="admin-auth-panel" class="hidden bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                    <h4 class="text-xs font-bold text-slate-800 flex items-center gap-1.5"><i data-lucide="shield-alert" class="w-4 h-4 text-indigo-600"></i>特権管理者ログイン</h4>
+                    <div class="flex gap-2">
+                        <input type="password" id="admin-password-input" placeholder="パスワード (dx2026)" class="flex-1 text-xs px-3 py-2 border rounded-lg">
+                        <button onclick="verifyAdminPassword()" class="text-xs bg-indigo-700 text-white px-3 py-2 rounded-lg font-bold">ログイン</button>
+                    </div>
+                </div>
 
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-[10px] text-slate-400 font-bold mb-1">① Google フォーム送信先URL</label>
-                            <input type="password" id="cfg-form-url"
-                                placeholder="https://docs.google.com/forms/u/0/d/e/.../formResponse"
-                                class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 outline-none focus:border-emerald-500">
-                        </div>
+                <div id="settings-panel" class="hidden bg-slate-900 text-slate-200 p-4 rounded-2xl flex flex-col gap-3">
+                    <h4 class="text-xs font-bold text-indigo-400">連携設定 (管理者のみ)</h4>
+                    <div class="flex flex-col gap-2 text-slate-300">
+                        <input type="text" id="cfg-form-url" placeholder="Googleフォーム送信先URL" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-2">
                         <div class="grid grid-cols-3 gap-1">
-                            <div>
-                                <label class="block text-[8px] text-slate-400 font-bold mb-0.5">お名前ID</label>
-                                <input type="text" id="cfg-entry-name" placeholder="entry.913..."
-                                    class="w-full bg-slate-800 border border-slate-700 rounded px-1.5 py-1 text-slate-200 text-[10px] outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[8px] text-slate-400 font-bold mb-0.5">業務ID</label>
-                                <input type="text" id="cfg-entry-job" placeholder="entry.184..."
-                                    class="w-full bg-slate-800 border border-slate-700 rounded px-1.5 py-1 text-slate-200 text-[10px] outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[8px] text-slate-400 font-bold mb-0.5">内容ID</label>
-                                <input type="text" id="cfg-entry-content" placeholder="entry.185..."
-                                    class="w-full bg-slate-800 border border-slate-700 rounded px-1.5 py-1 text-slate-200 text-[10px] outline-none">
-                            </div>
+                            <input type="text" id="cfg-id-name" placeholder="名前ID" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-1.5 text-center">
+                            <input type="text" id="cfg-id-job" placeholder="業務ID" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-1.5 text-center">
+                            <input type="text" id="cfg-id-type" placeholder="分類ID" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-1.5 text-center">
                         </div>
-                        <div>
-                            <label class="block text-[10px] text-slate-400 font-bold mb-1">② スプレッドシート公開CSV URL</label>
-                            <input type="password" id="cfg-csv-url"
-                                placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv"
-                                class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] text-slate-400 font-bold mb-1">③
-                                メンバー用アクセスキー（空欄でロック解除）</label>
-                            <input type="text" id="cfg-member-key" placeholder="例：kankyo2026"
-                                class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 outline-none focus:border-emerald-500">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] text-slate-400 font-bold mb-1">④ 労務単価 (時給円換算)</label>
-                            <input type="number" id="cfg-labour-price" value="2500"
-                                class="w-full bg-slate-800 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 outline-none focus:border-emerald-500">
-                        </div>
-                        <button onclick="saveAdminSettings()"
-                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded shadow-sm text-xs">連携設定を安全に保存</button>
+                        <input type="text" id="cfg-id-content" placeholder="お悩み内容ID" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-2">
+                        <input type="text" id="cfg-csv-url" placeholder="スプレッドシート公開CSV URL" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-2">
+                        <input type="text" id="cfg-chat-url" placeholder="通知用チャットURL (Webhook)" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded p-2">
                     </div>
+                    <button onclick="saveConfigurations()" class="w-full text-xs bg-indigo-600 text-white py-2 rounded-lg font-bold mt-2">設定を保存</button>
                 </div>
 
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
-                    <h4 class="text-xs font-bold text-slate-900 flex items-center gap-1.5 border-b pb-2"><i
-                            data-lucide="qr-code" class="w-4 h-4 text-teal-600"></i>スマホ共有用QRコード</h4>
-                    <div class="flex flex-col items-center gap-2 bg-slate-50 p-3 rounded-xl border">
-                        <div id="qrcode-container"
-                            class="w-24 h-28 flex items-center justify-center border bg-white text-[10px] text-slate-400 font-bold rounded">
-                            URLを入力</div>
-                        <input type="text" id="site-url-input" oninput="generateQRCode()" placeholder="NetlifyのURLを入力"
-                            class="text-[10px] text-center w-full border rounded px-2 py-1 outline-none bg-white">
-                    </div>
-                </div>
             </div>
         </div>
     </main>
 
-    <!-- フッター -->
-    <footer class="bg-white border-t border-slate-200 py-3 mt-6">
-        <div class="max-w-7xl mx-auto px-4 text-center text-[10px] sm:text-xs text-slate-400">
-            DX推進ネットワーク事務局 &copy; 2026 - 環境事業部 現場変革プロジェクト
-        </div>
-    </footer>
-
-    <!-- 管理者用ログインモーダル -->
-    <div id="login-modal"
-        class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-3">
-            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2"><i data-lucide="shield-check"
-                    class="text-indigo-600"></i>アンバサダーモード認証</h3>
-            <p class="text-[11px] text-slate-500 leading-relaxed">管理者用の自動集計データベースおよび各種連携設定をアンロックします。</p>
-            <input type="password" id="admin-password" placeholder="パスワードを入力"
-                class="w-full text-sm border rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500">
-            <div class="flex gap-2 mt-2">
-                <button onclick="closeLoginModal()"
-                    class="flex-1 text-xs border py-2 rounded-lg hover:bg-slate-50">戻る</button>
-                <button onclick="checkAdminPassword()"
-                    class="flex-1 text-xs bg-indigo-600 text-white font-bold py-2 rounded-lg">解除</button>
-            </div>
-        </div>
+    <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 transition-all duration-300 translate-y-20 opacity-0 z-50">
+        <i id="toast-icon" data-lucide="info" class="w-4 h-4"></i>
+        <span id="toast-message">メッセージ</span>
     </div>
 
-    <!-- トースト表示 -->
-    <div id="toast"
-        class="fixed bottom-5 right-5 bg-slate-900 text-white text-[11px] sm:text-xs px-4 py-3 rounded-xl shadow-2xl border transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2.5 z-50">
-        <i data-lucide="info" class="w-4 h-4 text-emerald-400" id="toast-icon"></i><span id="toast-message"></span>
-    </div>
-
-    <!-- スクリプト -->
     <script>
-        // ==========================================
-        // 【★ 1. グローバル関数と初期化 ★】
-        // ==========================================
+        lucide.createIcons();
+        let currentMode = 'member';
+        let CONFIG = {};
 
-        // ラジオボタン（手間/課題/希望）のビジュアルスタイルを更新
+        // 起動時に保存された設定を読み込む
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('dx_window_config');
+            if (saved) {
+                CONFIG = JSON.parse(saved);
+                document.getElementById('cfg-form-url').value = CONFIG.formUrl || '';
+                document.getElementById('cfg-id-name').value = CONFIG.idName || '';
+                document.getElementById('cfg-id-job').value = CONFIG.idJob || '';
+                document.getElementById('cfg-id-type').value = CONFIG.idType || '';
+                document.getElementById('cfg-id-content').value = CONFIG.idContent || '';
+                document.getElementById('cfg-csv-url').value = CONFIG.csvUrl || '';
+                document.getElementById('cfg-chat-url').value = CONFIG.chatUrl || '';
+            }
+        });
+
+        // ラジオボタンの見た目を切り替える関数（バグ修正済）
         function updateRadioStyles() {
-            const types = document.getElementsByName('mem-type');
-            types.forEach((type, index) => {
-                const label = document.getElementById('label-type-' + (index + 1));
-                if (label) {
-                    label.className = type.checked ? "border-2 border-emerald-500 bg-emerald-50 rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer text-center scale-105 transition-all font-bold text-emerald-900" : "border border-slate-200 bg-white rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50 text-center text-slate-600";
-                }
-            });
-        }
-
-        const ADMIN_PWD_HASH = "dx2026";
-        const DEFAULT_DAYS_PER_MONTH = 20;
-
-        // 現場のお悩み分類ごとの初期削減値
-        const DEFAULT_REDUCTION_PARAMS = {
-            "手間": { timeSaved: 30 },
-            "困りごと": { timeSaved: 60 },
-            "希望": { timeSaved: 45 }
-        };
-
-        let isAuthorized = false;
-        let masterFeedbackData = [];
-
-        window.onload = function () {
-            lucide.createIcons();
-
-            // メンバー用パスワードロック状態の判定
-            checkMemberSecurityState();
-
-            // 管理者モードの復元
-            if (sessionStorage.getItem('dx_ambassador_authed') === 'true') {
-                authorizeAdmin(true);
-            } else {
-                updateLayout();
-            }
-
-            loadInitialData();
-            updateRadioStyles();
-        };
-
-        // メンバー用パスワード制限キーの認証チェック
-        function checkMemberSecurityState() {
-            const configuredKey = localStorage.getItem('dx_cfg_member_key') || "kankyo2026"; // デフォルトメンバーキー
-            const isVerified = sessionStorage.getItem('dx_member_verified') === 'true';
-
-            // もし設定キーが空ならロック不要
-            if (!configuredKey) {
-                document.getElementById('member-lock-screen').classList.add('hidden');
-                document.getElementById('content-member').classList.remove('hidden');
-                return;
-            }
-
-            if (isVerified || isAuthorized) {
-                document.getElementById('member-lock-screen').classList.add('hidden');
-                document.getElementById('content-member').classList.remove('hidden');
-            } else {
-                document.getElementById('member-lock-screen').classList.remove('hidden');
-                document.getElementById('content-member').classList.add('hidden');
-            }
-        }
-
-        // メンバーパスワードの照合
-        function checkMemberAccessKey() {
-            const configuredKey = localStorage.getItem('dx_cfg_member_key') || "kankyo2026";
-            const inputVal = document.getElementById('member-access-key-input').value.trim();
-
-            if (inputVal === configuredKey) {
-                sessionStorage.setItem('dx_member_verified', 'true');
-                showToast("認証成功！お悩み入力窓口を開きました。", "unlock");
-                checkMemberSecurityState();
-            } else {
-                showToast("アクセスキーが違います！正しいキーを入力してください。", "alert-octagon");
-            }
-        }
-
-        function loadInitialData() {
-            const stored = localStorage.getItem('dx_master_feedbacks');
-            if (stored) {
-                masterFeedbackData = JSON.parse(stored);
-            } else {
-                masterFeedbackData = [
-                    { date: "2026-07-05", name: "山田 健一", job: "維持管理（第一処理場）", type: "手間（面倒なこと）", content: "定時点検でメーター数値を手帳にメモして戻ってからExcelへ再入力。二度手間で面倒。", priority: "高", status: "未対応", timeSaved: 45, costSaved: 1875 },
-                    { date: "2026-07-06", name: "佐藤 美香", job: "事務（環境管理部）", type: "困りごと（負担・課題）", content: "各現場提出のデータを役所指定フォーマット（産廃排出報告資料）に手動集計するのが大きな負担。", priority: "高", status: "対応中", timeSaved: 60, costSaved: 2500 },
-                    { date: "2026-07-07", name: "高橋 誠", job: "施設管理課", type: "希望（改善アイデア）", content: "毎日100枚以上撮影する確認写真を1枚ずつ手動リネーム・フォルダ保存している。自動化希望。", priority: "中", status: "解決済", timeSaved: 30, costSaved: 1250 }
-                ];
-                localStorage.setItem('dx_master_feedbacks', JSON.stringify(masterFeedbackData));
-            }
-            filterDataByMonth();
-        }
-
-        // ネットからGoogle CSVデータを自動フェッチ（リアルタイム同期）
-        function fetchLatestSheetData() {
-            const csvUrl = localStorage.getItem('dx_cfg_csv_url');
-            if (!csvUrl) {
-                showToast("シート連携設定（CSV URL）が未登録です！", "alert-circle");
-                return;
-            }
-
-            const syncIcon = document.getElementById('sync-icon-spin');
-            if (syncIcon) syncIcon.classList.add('animate-spin');
-
-            fetch(csvUrl)
-                .then(res => {
-                    if (!res.ok) throw new Error("CORS or Network Error");
-                    return res.text();
-                })
-                .then(csvText => {
-                    const parsed = parseCSV(csvText);
-                    if (parsed.length > 1) {
-                        syncAndOverwriteLocalData(parsed);
-                    }
-                })
-                .catch(err => {
-                    console.error("Fetch Error:", err);
-                    showToast("同期に失敗。公開設定とURLを確認してください。", "alert-octagon");
-                })
-                .finally(() => {
-                    if (syncIcon) syncIcon.classList.remove('animate-spin');
-                });
-        }
-
-        function syncAndOverwriteLocalData(lines) {
-            const newList = [];
-            const labourPrice = Number(localStorage.getItem('dx_cfg_labour_price')) || 2500;
-
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i];
-                if (cols.length >= 4) {
-                    let dateStr = "2026-07-07";
-                    if (cols[0] && (cols[0].includes('-') || cols[0].includes('/'))) {
-                        const datePart = cols[0].split(' ')[0];
-                        if (datePart.includes('/')) {
-                            const p = datePart.split('/');
-                            dateStr = `${p[0]}-${p[1].padStart(2, '0')}-${p[2].padStart(2, '0')}`;
-                        } else {
-                            dateStr = datePart;
-                        }
-                    }
-
-                    let contentRaw = cols[3] || "";
-                    let type = "手間（面倒なこと）";
-                    if (contentRaw.startsWith('【')) {
-                        const endIdx = contentRaw.indexOf('】');
-                        if (endIdx !== -1) {
-                            type = contentRaw.substring(1, endIdx);
-                            contentRaw = contentRaw.substring(endIdx + 1).trim();
-                        }
-                    }
-
-                    const cleanType = type.includes('手間') ? '手間' : type.includes('困りごと') ? '困りごと' : '希望';
-                    const defaultMinutes = DEFAULT_REDUCTION_PARAMS[cleanType].timeSaved;
-
-                    newList.push({
-                        date: dateStr,
-                        name: cols[1] || "匿名",
-                        job: cols[2] || "未特定",
-                        type: type,
-                        content: contentRaw,
-                        priority: cols[4] || "中",
-                        status: cols[5] || "未対応",
-                        timeSaved: Number(cols[6]) || defaultMinutes,
-                        costSaved: ((Number(cols[6]) || defaultMinutes) / 60) * labourPrice
-                    });
-                }
-            }
-
-            if (newList.length > 0) {
-                masterFeedbackData = newList;
-                localStorage.setItem('dx_master_feedbacks', JSON.stringify(masterFeedbackData));
-                filterDataByMonth();
-                showToast(`スプレッドシート(${newList.length}件)から最新情報を自動取得しました！`, "check");
-            }
-        }
-
-        function parseCSV(text) {
-            let lines = [];
-            let row = [""];
-            let inQuotes = false;
-
-            for (let i = 0; i < text.length; i++) {
-                let c = text[i];
-                let next = text[i + 1];
-                if (c === '"') {
-                    if (inQuotes && next === '"') { row[row.length - 1] += '"'; i++; }
-                    else { inQuotes = !inQuotes; }
-                } else if (c === ',' && !inQuotes) {
-                    row.push('');
-                } else if ((c === '\r' || c === '\n') && !inQuotes) {
-                    if (c === '\r' && next === '\n') { i++; }
-                    lines.push(row);
-                    row = [''];
+            const labels = document.querySelectorAll('.radio-label');
+            labels.forEach(label => {
+                const radio = label.querySelector('input[type="radio"]');
+                if (radio && radio.checked) {
+                    label.classList.remove('border-slate-200', 'hover:bg-slate-50');
+                    label.classList.add('border-teal-600', 'bg-teal-50', 'border-2');
                 } else {
-                    row[row.length - 1] += c;
+                    label.classList.add('border-slate-200', 'hover:bg-slate-50');
+                    label.classList.remove('border-teal-600', 'bg-teal-50', 'border-2');
                 }
-            }
-            if (row.length > 1 || row[0] !== '') lines.push(row);
-            return lines;
+            });
         }
 
-        function saveAdminSettings() {
-            const formUrl = document.getElementById('cfg-form-url').value.trim();
-            const entryName = document.getElementById('cfg-entry-name').value.trim();
-            const entryJob = document.getElementById('cfg-entry-job').value.trim();
-            const entryContent = document.getElementById('cfg-entry-content').value.trim();
-            const csvUrl = document.getElementById('cfg-csv-url').value.trim();
-            const memberKey = document.getElementById('cfg-member-key').value.trim();
-            const labourPrice = document.getElementById('cfg-labour-price').value.trim();
-
-            if (formUrl) localStorage.setItem('dx_cfg_form_url', formUrl);
-            if (entryName) localStorage.setItem('dx_cfg_entry_name', entryName);
-            if (entryJob) localStorage.setItem('dx_cfg_entry_job', entryJob);
-            if (entryContent) localStorage.setItem('dx_cfg_entry_content', entryContent);
-            if (csvUrl) localStorage.setItem('dx_cfg_csv_url', csvUrl);
-
-            // メンバーキーの保存（空欄なら制限なし）
-            localStorage.setItem('dx_cfg_member_key', memberKey);
-            if (labourPrice) localStorage.setItem('dx_cfg_labour_price', labourPrice);
-
-            showToast("Google連携設定 ＆ 単価・キー設定を安全に保存しました！", "check-circle");
-
-            // 画面のロック状態をリフレッシュ
-            checkMemberSecurityState();
-            if (csvUrl) fetchLatestSheetData();
-        }
-
-        function filterDataByMonth() {
-            const monthSelector = document.getElementById('month-filter');
-            const selectedMonth = monthSelector ? monthSelector.value : "all";
-            let filtered = [];
-
-            if (selectedMonth === 'all') {
-                filtered = masterFeedbackData;
-                const rTitle = document.getElementById('report-month-title');
-                if (rTitle) rTitle.textContent = "全期間 総合費用対効果報告書";
+        // メンバーパスワード認証
+        function verifyAccessKey() {
+            if (document.getElementById('access-key-input').value === 'kankyo2026') {
+                document.getElementById('member-auth-section').classList.add('hidden');
+                document.getElementById('submission-form').classList.remove('hidden');
+                showToast("ロックを解除しました", "unlock");
             } else {
-                filtered = masterFeedbackData.filter(d => d.date && d.date.startsWith(selectedMonth));
-                const [year, month] = selectedMonth.split('-');
-                const rTitle = document.getElementById('report-month-title');
-                if (rTitle) rTitle.textContent = `${year}年 ${month}月度 費用対効果報告書`;
+                showToast("キーが違います", "lock");
             }
-
-            updateSummaryTable(filtered, selectedMonth);
         }
 
-        function updateSummaryTable(dataList, selectedMonth) {
-            const tbody = document.getElementById('table-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            const countType1El = document.getElementById('count-type-1');
-            const countType2El = document.getElementById('count-type-2');
-            const countType3El = document.getElementById('count-type-3');
-            const totalDbCountEl = document.getElementById('total-db-count');
-            const statTotalEl = document.getElementById('stat-total');
-            const statUnresolvedEl = document.getElementById('stat-unresolved');
-            const statResolvedEl = document.getElementById('stat-resolved');
-            const statHighPriorityEl = document.getElementById('stat-high-priority');
-
-            if (dataList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400 font-bold">まだデータがありません。設定から公開CSVを同期するか、回答を送信してください。</td></tr>`;
-                if (countType1El) countType1El.textContent = "0";
-                if (countType2El) countType2El.textContent = "0";
-                if (countType3El) countType3El.textContent = "0";
-                if (totalDbCountEl) totalDbCountEl.textContent = "0";
-                if (statTotalEl) statTotalEl.textContent = "0";
-                if (statUnresolvedEl) statUnresolvedEl.textContent = "0";
-                if (statResolvedEl) statResolvedEl.textContent = "0";
-                if (statHighPriorityEl) statHighPriorityEl.textContent = "0";
-                generatePresentationScript([], 0, 0, 0, 0, 0, 0, selectedMonth);
-                return;
+        // 管理者パスワード認証と画面切り替え
+        function toggleMode() {
+            if (currentMode === 'member') {
+                document.getElementById('admin-auth-panel').classList.remove('hidden');
+            } else {
+                currentMode = 'member';
+                document.getElementById('nav-btn-text').textContent = '管理者用ログイン';
+                document.getElementById('content-admin').classList.add('hidden');
+                document.getElementById('settings-panel').classList.add('hidden');
+                document.getElementById('content-member').classList.remove('hidden');
             }
-
-            let total = dataList.length, unresolved = 0, resolved = 0, highPriority = 0;
-            let type1 = 0, type2 = 0, type3 = 0;
-            let totalHoursSaved = 0;
-            let totalMoneySaved = 0;
-
-            const labourPrice = Number(localStorage.getItem('dx_cfg_labour_price')) || 2500;
-
-            dataList.forEach(d => {
-                if (d.status === '未対応' || d.status === '対応中') unresolved++;
-                if (d.status === '解決済') resolved++;
-                if (d.priority === '高') highPriority++;
-
-                if (d.type && d.type.includes('手間')) type1++;
-                if (d.type && d.type.includes('困りごと')) type2++;
-                if (d.type && d.type.includes('希望')) type3++;
-
-                const h = Number(d.timeSaved || 30) / 60;
-                totalHoursSaved += h;
-                totalMoneySaved += h * labourPrice;
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-all text-xs";
-
-                let pClass = "text-slate-400";
-                if (d.priority === '高') pClass = "bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded";
-                if (d.priority === '中') pClass = "bg-slate-100 text-slate-700 px-2 py-0.5 rounded";
-                if (d.priority === '低') pClass = "bg-slate-50 text-slate-400 px-2 py-0.5 rounded";
-
-                let sClass = "text-slate-500";
-                if (d.status === '未対応') sClass = "text-rose-600 font-bold bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded";
-                if (d.status === '対応中') sClass = "text-indigo-600 font-bold bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded";
-                if (d.status === '解決済') sClass = "text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded";
-
-                tr.innerHTML = `
-                    <td class="px-2 py-3 border-b text-center"><span class="${pClass}">${d.priority || '中'}</span></td>
-                    <td class="px-2 py-3 border-b text-center"><span class="${sClass}">${d.status || '未対応'}</span></td>
-                    <td class="px-3 py-3 border-b font-bold text-slate-900">${d.name}</td>
-                    <td class="px-3 py-3 border-b text-slate-600">${d.job}</td>
-                    <td class="px-3 py-3 border-b text-slate-700 leading-relaxed">
-                        <span class="font-bold text-indigo-700">[${d.type}]</span> ${d.content}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            if (countType1El) countType1El.textContent = type1;
-            if (countType2El) countType2El.textContent = type2;
-            if (countType3El) countType3El.textContent = type3;
-            if (totalDbCountEl) totalDbCountEl.textContent = total;
-
-            if (statTotalEl) statTotalEl.textContent = total;
-            if (statUnresolvedEl) statUnresolvedEl.textContent = unresolved;
-            if (statResolvedEl) statResolvedEl.textContent = resolved;
-            if (statHighPriorityEl) statHighPriorityEl.textContent = highPriority;
-
-            const monthlyHours = Math.round(totalHoursSaved * DEFAULT_DAYS_PER_MONTH);
-            const monetarySuccess = Math.round(totalMoneySaved * DEFAULT_DAYS_PER_MONTH);
-
-            generatePresentationScript(dataList, total, type1, type2, type3, monthlyHours, monetarySuccess, selectedMonth);
         }
 
-        function generatePresentationScript(dataList, total, type1, type2, type3, monthlyHours, moneySaved, selectedMonth) {
-            let monthLabel = "全期間 総合";
-            if (selectedMonth && selectedMonth !== 'all') {
-                const [y, m] = selectedMonth.split('-');
-                monthLabel = `${y}年 ${m}月度`;
+        function verifyAdminPassword() {
+            if (document.getElementById('admin-password-input').value === 'dx2026') {
+                currentMode = 'admin';
+                document.getElementById('admin-auth-panel').classList.add('hidden');
+                document.getElementById('nav-btn-text').textContent = 'ログアウト';
+                document.getElementById('content-member').classList.add('hidden');
+                document.getElementById('content-admin').classList.remove('hidden');
+                document.getElementById('settings-panel').classList.remove('hidden');
+                showToast("管理者モードに切り替えました", "shield-check");
+                if (CONFIG.csvUrl) syncWithGoogleSheet();
+            } else {
+                showToast("パスワードが違います", "lock");
             }
-
-            const labourPrice = Number(localStorage.getItem('dx_cfg_labour_price')) || 2500;
-
-            let reportText = `第2回 DX推進ネットワークミーティング報告資料
-環境事業部 維持管理アンバサダー報告レジュメ
-対象期間: ${monthLabel}
-
-【発表テーマ】
-実務にいかす環境事業部・維持管理DX ― 現場のリアルな声と費用対効果の概算算出
-
-■ 1. 現場の課題収集 ＆ 進捗状況（月別ダッシュボード集計）
---------------------------------------------------
-・収集した現場の『生の声』： 合計 ${total} 件
-・内訳分析：
-  └ ① 手間・面倒なルーティン作業： ${type1} 件
-  └ ② 困りごと・負担の大きい課題： ${type2} 件
-  └ ③ 希望・改善に関するアイデア： ${type3} 件
-・現在の進捗状況：
-  └ 解決・対応済み： ${dataList.filter(d => d.status === '解決済').length} 件
-  └ 未対応・検討中： ${dataList.filter(d => d.status !== '解決済').length} 件
-・優先順位【高（最優先）】に指定した項目： ${dataList.filter(d => d.priority === '高').length} 件
-
-■ 2. DX・AX化による期待される『費用対効果』の概算予測
---------------------------------------------------
-当部門の提出課題に基づき、システム化による「時間短縮効果」および「削減人件費」を試算しました。
-※（試算条件：現場1点検アクションあたり削減時間をもとに、1名あたり月間 20 日稼働、労務単価 ${labourPrice.toLocaleString()} 円/時として連動計算）
-
-・【月間想定削減時間】： 合計 約 ${monthlyHours || 0} 時間 の業務短縮
-・【年間想定削減時間】： 合計 約 ${(monthlyHours || 0) * 12} 時間 （現場のゆとり創出）
-
-💰【削減される想定人件費（コストカット効果）】
-  └ 月間削減額： 約 ${(moneySaved || 0).toLocaleString()} 円 / 月
-  └ 年間削減額： 約 ${((moneySaved || 0) * 12).toLocaleString()} 円 / 年 の人件費削減効果
-
-■ 3. 主要なお悩みのピックアップと優先改善要望
---------------------------------------------------\n`;
-
-            dataList.forEach((data, index) => {
-                reportText += `[案件 #${index + 1}] (優先度: ${data.priority || '中'} / 状態: ${data.status || '未対応'})
-・報告者: ${data.name}さん (${data.job})
-・内容: ${data.content}
-・想定時短効果: 約 ${data.timeSaved || 30}分 / 日\n--------------------------------------------------\n`;
-            });
-
-            reportText += `\n■ 4. 本部への具体的な提案
-1. 【計器点検メーター二重入力問題】
-   ⇒ 現場から一番多く挙がった「野帳の手書きメモ ＆ 帰社後のExcel再入力」を改善するため、
-      現場からスマホを用いて直接一発で入力・集計できる簡易データベースへの移行を提案します。
-
-2. 【効果逆算：写真自動整理・リネームツールのチーム内展開】
-   ⇒ 報告用に撮影された大量の写真を自動でファイルリネームし、仕分けする「自動リネーム＆整理ツール」のチーム内展開を要望します。
-
-3. 【産廃・マニフェスト集計業務のスマート化】
-   ⇒ 役所報告用（多量排出報告）の手動集計の削減に向けて、業者ごとにバラバラなデータをAIで自動読み取り・マージする仕組みの検証を進めます。
-
----
-以上、環境事業部 報告`;
-
-            const rArea = document.getElementById('generated-report-area');
-            if (rArea) rArea.value = reportText;
         }
 
-        // Google フォーム送信
-        function submitToGoogleForm() {
-            const formUrl = localStorage.getItem('dx_cfg_form_url');
-            const entryName = localStorage.getItem('dx_cfg_entry_name');
-            const entryJob = localStorage.getItem('dx_cfg_entry_job');
-            const entryContent = localStorage.getItem('dx_cfg_entry_content');
-
-            if (!formUrl || !entryName || !entryJob || !entryContent) {
-                showToast("Google フォームの設定が完了していません。管理者としてログインして設定を登録してください。", "alert-circle");
-                return;
-            }
-
-            const name = document.getElementById('mem-name').value.trim();
-            const job = document.getElementById('mem-job').value.trim();
-            const content = document.getElementById('mem-content').value.trim();
-            const type = document.querySelector('input[name="mem-type"]:checked').value;
-
-            if (!name || !job || !content) { showToast("未入力の項目があります！", "alert-circle"); return; }
-
-            const btn = document.getElementById('btn-submit-db');
-            btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>送信中...</span>`;
-            lucide.createIcons();
-
-            const fullContent = `【${type}】 ${content}`;
-
-            const formData = new FormData();
-            formData.append(entryName, name);
-            formData.append(entryJob, job);
-            formData.append(entryContent, fullContent);
-
-            fetch(formUrl, {
-                method: "POST",
-                mode: "no-cors",
-                body: formData
-            }).then(() => {
-                const today = new Date().toISOString().split('T')[0];
-                const cleanType = type.includes('手間') ? '手間' : type.includes('困りごと') ? '困りごと' : '希望';
-                const defaultMinutes = DEFAULT_REDUCTION_PARAMS[cleanType].timeSaved;
-                const labourPrice = Number(localStorage.getItem('dx_cfg_labour_price')) || 2500;
-
-                const newFeedback = {
-                    date: today, name, job, type, content,
-                    priority: "中", status: "未対応", timeSaved: defaultMinutes, costSaved: (defaultMinutes / 60) * labourPrice
-                };
-                masterFeedbackData.unshift(newFeedback);
-                localStorage.setItem('dx_master_feedbacks', JSON.stringify(masterFeedbackData));
-                filterDataByMonth();
-
-                sendWebhookNotification(newFeedback);
-
-                showToast("送信が完了しました！Googleスプレッドシートへ自動集計されました。", "check");
-                clearMemberForm();
-            }).catch(err => {
-                console.error(err);
-                showToast("送信エラーが発生しました。インターネット接続を確認してください。", "alert-circle");
-            }).finally(() => {
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i><span>データベースに自動送信</span>`;
-                lucide.createIcons();
-            });
+        // 設定の保存
+        function saveConfigurations() {
+            CONFIG = {
+                formUrl: document.getElementById('cfg-form-url').value.trim(),
+                idName: document.getElementById('cfg-id-name').value.trim(),
+                idJob: document.getElementById('cfg-id-job').value.trim(),
+                idType: document.getElementById('cfg-id-type').value.trim(),
+                idContent: document.getElementById('cfg-id-content').value.trim(),
+                csvUrl: document.getElementById('cfg-csv-url').value.trim(),
+                chatUrl: document.getElementById('cfg-chat-url').value.trim()
+            };
+            localStorage.setItem('dx_window_config', JSON.stringify(CONFIG));
+            showToast("設定を保存しました", "save");
         }
 
-        // Webhook通知
-        async function sendWebhookNotification(data) {
-            const webhookUrl = localStorage.getItem('dx_webhook_url');
-            if (!webhookUrl) return;
+        // フォーム送信（Googleフォーム ＆ Chat）
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            if (!CONFIG.formUrl) return showToast("管理者の連携設定が終わっていません", "alert-circle");
 
-            const payload = {
-                text: `🔔 *【環境事業部】新しい現場の声が届きました！*\n\n*■ 報告者*: ${data.name}さん (${data.job})\n*■ 分類*: ${data.type}\n*■ 内容*: \n${data.content}`
+            const typeInput = document.querySelector('input[name="mem-type"]:checked');
+            if (!typeInput) return showToast("分類を選択してください", "alert-circle");
+
+            const data = {
+                name: document.getElementById('mem-name').value,
+                job: document.getElementById('mem-job').value,
+                type: typeInput.value,
+                content: document.getElementById('mem-content').value
             };
 
+            const formData = new FormData();
+            formData.append(`entry.${CONFIG.idName}`, data.name);
+            formData.append(`entry.${CONFIG.idJob}`, data.job);
+            formData.append(`entry.${CONFIG.idType}`, data.type);
+            formData.append(`entry.${CONFIG.idContent}`, data.content);
+
             try {
-                await fetch(webhookUrl, { method: 'POST', body: JSON.stringify(payload) });
-            } catch (err) { console.error(err); }
-        }
+                fetch(CONFIG.formUrl, { method: 'POST', body: formData, mode: 'no-cors' });
+                
+                if (CONFIG.chatUrl) {
+                    const chatText = `【新着】お悩み受付\n送信者: ${data.name} (${data.job})\n分類: ${data.type}\n内容:\n${data.content}`;
+                    fetch(CONFIG.chatUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: chatText })
+                    });
+                }
 
-        // スプレッドシート手動パース同期 (フォールバック用)
-        function syncPastedSheetData() {
-            const rawText = document.getElementById('sheet-paste-area').value.trim();
-            if (!rawText) return;
-            const parsed = parseCSV(rawText.replace(/\t/g, ','));
-            if (parsed.length > 0) {
-                syncAndOverwriteLocalData(parsed);
-                document.getElementById('sheet-paste-area').value = '';
+                showToast("送信が完了しました！", "check-circle");
+                e.target.reset();
+                updateRadioStyles();
+            } catch (err) {
+                showToast("通信エラーが発生しました", "alert-octagon");
             }
         }
 
-        function updateLayout() {
-            const mainLayout = document.getElementById('main-layout-container');
-            const mainGrid = document.getElementById('main-content-grid');
-            const mainCol = document.getElementById('main-column-container');
-            const sidebar = document.getElementById('sidebar-container');
-            const tabBar = document.getElementById('tab-navigation-bar');
-            const statusBadge = document.getElementById('status-badge');
+        // スプレッドシート同期処理（ダッシュボード）
+        async function syncWithGoogleSheet() {
+            if (!CONFIG.csvUrl) return showToast("CSV URLが設定されていません", "alert-circle");
+            const icon = document.getElementById('sync-icon');
+            icon.classList.add('animate-spin');
 
-            if (isAuthorized) {
-                if (mainLayout) mainLayout.className = "flex-1 w-full mx-auto px-3 py-4 sm:px-6 lg:px-8 flex flex-col gap-4 sm:gap-6 max-w-7xl";
-                if (mainGrid) mainGrid.className = "grid grid-cols-1 lg:grid-cols-3 gap-6";
-                if (mainCol) mainCol.className = "lg:col-span-2 flex flex-col gap-6";
-                if (sidebar) sidebar.classList.remove('hidden');
-                if (tabBar) {
-                    tabBar.classList.remove('hidden');
-                    tabBar.classList.add('flex');
+            try {
+                const res = await fetch(`${CONFIG.csvUrl}&t=${Date.now()}`);
+                const text = await res.text();
+                
+                const lines = text.split(/\r?\n/).slice(1).filter(l => l.trim() !== '');
+                const tbody = document.getElementById('dashboard-table-body');
+                tbody.innerHTML = '';
+                
+                document.getElementById('card-total').textContent = lines.length;
+                document.getElementById('card-pending').textContent = Math.ceil(lines.length * 0.7);
+                document.getElementById('card-solved').textContent = Math.floor(lines.length * 0.3);
+
+                if (lines.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">データがありません</td></tr>`;
+                    return;
                 }
-                if (statusBadge) {
-                    statusBadge.classList.remove('hidden');
-                    statusBadge.classList.add('flex');
-                }
-            } else {
-                if (mainLayout) mainLayout.className = "flex-1 w-full mx-auto px-4 py-6 flex flex-col gap-6 max-w-2xl";
-                if (mainGrid) mainGrid.className = "grid grid-cols-1 gap-6";
-                if (mainCol) mainCol.className = "flex flex-col gap-6";
-                if (sidebar) sidebar.classList.add('hidden');
-                if (tabBar) {
-                    tabBar.classList.add('hidden');
-                    tabBar.classList.remove('flex');
-                }
-                if (statusBadge) {
-                    statusBadge.classList.add('hidden');
-                    statusBadge.classList.remove('flex');
-                }
+
+                lines.forEach(line => {
+                    // 簡易CSVパース
+                    const cells = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, ''));
+                    if (cells.length >= 4) {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-medium">${cells[1] || ''}</td>
+                                <td class="p-3 text-slate-500">${cells[2] || ''}</td>
+                                <td class="p-3 text-indigo-600 font-bold">${cells[3] || ''}</td>
+                                <td class="p-3">${cells[4] || ''}</td>
+                            </tr>
+                        `;
+                    }
+                });
+                showToast("データを同期しました", "check");
+            } catch (err) {
+                showToast("データ同期に失敗しました", "alert-circle");
+            } finally {
+                icon.classList.remove('animate-spin');
             }
-        }
-
-        function switchTab(tabId) {
-            if (!isAuthorized && (tabId === 'ambassador' || tabId === 'report')) return;
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.className = "tab-btn flex-1 min-w-[125px] flex items-center justify-center gap-1.5 py-2.5 px-2 text-xs font-medium rounded-lg text-slate-600 hover:bg-slate-100");
-
-            const contentTab = document.getElementById('content-' + tabId);
-            if (contentTab) contentTab.classList.remove('hidden');
-
-            const tBtn = document.getElementById('tab-' + tabId);
-            if (tBtn) {
-                tBtn.className = `tab-btn flex-1 min-w-[125px] flex items-center justify-center gap-1.5 py-2.5 px-2 text-xs font-bold rounded-lg text-white shadow-sm bg-indigo-600`;
-            }
-            if (tabId === 'member') {
-                const tMem = document.getElementById('tab-member');
-                if (tMem) tMem.className = "tab-btn flex-1 min-w-[125px] flex items-center justify-center gap-1.5 py-2.5 px-2 text-xs font-bold rounded-lg text-white shadow-sm bg-emerald-600";
-            }
-            if (tabId === 'report' || tabId === 'ambassador') filterDataByMonth();
-        }
-
-        function insertExample(id) {
-            const jInput = document.getElementById('mem-job');
-            const cInput = document.getElementById('mem-content');
-            if (id === 1 && jInput && cInput) { jInput.value = "維持管理（第一水再生センター）"; cInput.value = "計器メーター点検で、数値を一度野帳（手帳）に手書きし、事務所に戻ってからExcelの点検報告書に再入力しています。二度手間で面倒なので、現場でスマホから一発で入力できるように改善してほしいです！"; document.getElementsByName('mem-type')[0].checked = true; }
-            if (id === 2 && jInput && cInput) { jInput.value = "プラント施設管理課"; cInput.value = "現場で毎日100枚以上撮影する確認写真を、PCに取り込んだあと1枚ずつ手動で名前変更・仕分けしています。自動リネーム＆整理ツールが欲しいです。"; document.getElementsByName('mem-type')[1].checked = true; }
-            if (id === 3 && jInput && cInput) { jInput.value = "産廃マニフェスト管理事務"; jInput.value = "各現場から回収した産廃マニフェスト伝票を、役所指定フォーマット（多量排出報告書）に合わせて手動転記・集計するのが非常に負担です。"; document.getElementsByName('mem-type')[2].checked = true; }
-            updateRadioStyles();
-        }
-
-        function clearMemberForm() {
-            const nInput = document.getElementById('mem-name');
-            const jInput = document.getElementById('mem-job');
-            const cInput = document.getElementById('mem-content');
-            if (nInput) nInput.value = '';
-            if (jInput) jInput.value = '';
-            if (cInput) cInput.value = '';
-            document.getElementsByName('mem-type')[0].checked = true;
-            updateRadioStyles();
-        }
-
-        function openLoginModal() {
-            if (isAuthorized) { logoutAdmin(); return; }
-            const pwdInput = document.getElementById('admin-password');
-            if (pwdInput) pwdInput.value = '';
-            const lModal = document.getElementById('login-modal');
-            if (lModal) lModal.classList.remove('hidden');
-        }
-
-        function closeLoginModal() {
-            const lModal = document.getElementById('login-modal');
-            if (lModal) lModal.classList.add('hidden');
-        }
-
-        function checkAdminPassword() {
-            const pwdInput = document.getElementById('admin-password');
-            if (pwdInput && pwdInput.value === ADMIN_PWD_HASH) {
-                authorizeAdmin(false); closeLoginModal();
-            } else { showToast("パスワードが違います！", "alert-circle"); }
-        }
-
-        function authorizeAdmin(isRestore) {
-            isAuthorized = true; sessionStorage.setItem('dx_ambassador_authed', 'true');
-
-            const loginBtnText = document.getElementById('login-btn-text');
-            const loginIcon = document.getElementById('login-icon');
-            const hTitle = document.getElementById('header-title');
-            const hSubtitle = document.getElementById('header-subtitle');
-
-            if (loginBtnText) loginBtnText.textContent = "ログアウト";
-            if (loginIcon) loginIcon.setAttribute('data-lucide', 'unlock');
-            if (hTitle) hTitle.textContent = "環境事業部 DXアンバサダー・コンソール";
-            if (hSubtitle) hSubtitle.textContent = "月別集計ダッシュボード ＆ 費用対効果自動計算システム";
-
-            ['tab-ambassador', 'tab-report'].forEach(id => {
-                const t = document.getElementById(id);
-                if (t) {
-                    t.disabled = false;
-                    t.classList.remove('hidden', 'text-slate-400', 'cursor-not-allowed', 'opacity-50');
-                }
-            });
-
-            const tAmb = document.getElementById('tab-ambassador');
-            const tRep = document.getElementById('tab-report');
-            if (tAmb) tAmb.querySelector('span').innerHTML = '📊 自動集計一覧';
-            if (tRep) tRep.querySelector('span').innerHTML = '📝 費用対効果 報告書作成';
-
-            const storedWebhook = localStorage.getItem('dx_webhook_url');
-            const wInput = document.getElementById('webhook-url-input');
-            if (storedWebhook && wInput) wInput.value = storedWebhook;
-
-            updateLayout();
-            checkMemberSecurityState(); // 画面ロックをリフレッシュ
-            filterDataByMonth();
-            lucide.createIcons();
-            if (!isRestore) switchTab('ambassador');
-        }
-
-        function logoutAdmin() {
-            isAuthorized = false; sessionStorage.removeItem('dx_ambassador_authed');
-            const loginBtnText = document.getElementById('login-btn-text');
-            const loginIcon = document.getElementById('login-icon');
-            const hTitle = document.getElementById('header-title');
-            const hSubtitle = document.getElementById('header-subtitle');
-
-            if (loginBtnText) loginBtnText.textContent = "管理者用ログイン";
-            if (loginIcon) loginIcon.setAttribute('data-lucide', 'lock');
-            if (hTitle) hTitle.textContent = "環境事業部 DXお悩み受付窓口";
-            if (hSubtitle) hSubtitle.textContent = "現場の「生の声」を直接会社に届ける窓口";
-
-            ['tab-ambassador', 'tab-report'].forEach(id => {
-                const t = document.getElementById(id);
-                if (t) {
-                    t.disabled = true;
-                    t.classList.add('hidden');
-                }
-            });
-
-            updateLayout();
-            checkMemberSecurityState(); // 一般のロック状態に戻す
-            switchTab('member'); lucide.createIcons();
-        }
-
-        function saveWebhookSettings() {
-            const wInput = document.getElementById('webhook-url-input');
-            let url = wInput ? wInput.value.trim() : "";
-            if (!url) { showToast("URLを入力してください", "alert-circle"); return; }
-            localStorage.setItem('dx_webhook_url', url);
-            showToast("通知用Webhook URLを正常に保存しました！", "check-circle");
-        }
-
-        function generateQRCode() {
-            const urlInput = document.getElementById('site-url-input');
-            const url = urlInput ? urlInput.value.trim() : "";
-            const container = document.getElementById('qrcode-container');
-            if (!container) return;
-            if (!url) { container.innerHTML = "URLを入力"; return; }
-            container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=112x112&data=${encodeURIComponent(url)}" class="w-full h-full p-1">`;
-        }
-
-        function copyTableToClipboard() {
-            const temp = document.createElement('textarea');
-            let txt = "日付\t担当者\t担当業務\t分類\tお悩み・提案\t優先度\tステータス\t削減時間(分)\t削減額(円)\n";
-            masterFeedbackData.forEach(d => txt += `${d.date}\t${d.name}\t${d.job}\t${d.type}\t${d.content}\t${d.priority || '中'}\t${d.status || '未対応'}\t${d.timeSaved || 30}\t${d.costSaved || 1250}\n`);
-            temp.value = txt; document.body.appendChild(temp); temp.select();
-            document.execCommand('copy'); document.body.removeChild(temp);
-            showToast("Excel用に表データをコピーしました！", "copy");
-        }
-
-        function copyGeneratedReport() {
-            const area = document.getElementById('generated-report-area');
-            if (!area) return;
-            area.select();
-            document.execCommand('copy'); showToast("報告レジュメをコピーしました！", "copy");
         }
 
         function showToast(msg, icon) {
             const t = document.getElementById('toast');
-            const tMsg = document.getElementById('toast-message');
-            const tIcon = document.getElementById('toast-icon');
-            if (!t || !tMsg || !tIcon) return;
-
-            tMsg.textContent = msg;
-            tIcon.setAttribute('data-lucide', icon);
+            document.getElementById('toast-message').textContent = msg;
+            document.getElementById('toast-icon').setAttribute('data-lucide', icon);
             lucide.createIcons();
-
             t.classList.remove('translate-y-20', 'opacity-0');
             t.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
@@ -1140,11 +379,6 @@
                 t.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
-        function updateRadioStyles() {
-            // ラジオボタンのデザインを切り替える処理
-            // （もしdx(3).htmlの末尾にこの名前の関数があれば、中身ごと丸ごと持ってきてください）
-        }
     </script>
 </body>
-
 </html>
